@@ -9,6 +9,7 @@
 # Week 1 — Foundation (July 13–19, 2026)
 
 ## 🎯 Goal
+
 Build a solid desktop application foundation.
 
 ### ✅ Completed
@@ -19,14 +20,17 @@ Build a solid desktop application foundation.
 - [x] Configure development environment (Hot Reload)
 - [x] Configure Tailwind CSS
 - [x] Initialize shadcn/ui
+- [x] Build application shell
+- [x] Create sidebar navigation
+- [x] Create dashboard
+- [x] Create reusable UI components
 
 ### 🚧 Next
 
-- [ ] Build application layout
-- [ ] Create sidebar
-- [ ] Build dashboard
-- [ ] Create reusable UI components
-- [ ] Add dark theme
+- [ ] Implement dark theme
+- [ ] Polish application layout
+- [ ] Prepare system monitoring architecture
+
 ---
 
 # Week 2 — System Monitoring

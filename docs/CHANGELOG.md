@@ -8,20 +8,27 @@ All notable changes to Pulse AI will be documented in this file.
 
 ### Added
 
+#### Project Setup
 - Created GitHub repository.
 - Set up npm workspace monorepo.
 - Initialized Electron + React + TypeScript desktop application.
 - Configured Electron development environment.
 - Enabled React hot reload.
+
+#### Architecture
 - Established initial project architecture (`apps/`, `packages/`, `docs/`).
-
-### Added
-
-- Configured Tailwind CSS v4.
 - Configured TypeScript path aliases (`@/*`).
+
+#### UI Foundation
+- Configured Tailwind CSS v4.
 - Initialized shadcn/ui with the Nova preset.
 - Added the first reusable UI component (`Button`).
-- Established the project's design system foundation.
-### Notes
+- Built the application shell.
+- Implemented sidebar navigation.
+- Added reusable navigation item component.
+- Created the initial dashboard page.
+- Added reusable system statistic cards.
 
-- Switched from a manual Electron integration to a dedicated Electron + Vite template for a more maintainable foundation.
+### Changed
+
+- Switched from a manual Electron integration to the Electron + Vite template for a more maintainable development environment.
