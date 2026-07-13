@@ -17,16 +17,16 @@ Build a solid desktop application foundation.
 - [x] Set up npm workspace monorepo
 - [x] Initialize Electron + React + TypeScript desktop application
 - [x] Configure development environment (Hot Reload)
+- [x] Configure Tailwind CSS
+- [x] Initialize shadcn/ui
 
 ### 🚧 Next
 
-- [ ] Configure Tailwind CSS
 - [ ] Build application layout
 - [ ] Create sidebar
 - [ ] Build dashboard
 - [ ] Create reusable UI components
 - [ ] Add dark theme
-
 ---
 
 # Week 2 — System Monitoring
