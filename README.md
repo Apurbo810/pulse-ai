@@ -1,0 +1,73 @@
+
+```
+pulse-ai
+├─ apps
+│  └─ desktop
+│     ├─ .eslintrc.cjs
+│     ├─ electron
+│     │  ├─ electron-env.d.ts
+│     │  ├─ main.ts
+│     │  └─ preload.ts
+│     ├─ electron-builder.json5
+│     ├─ index.html
+│     ├─ package-lock.json
+│     ├─ package.json
+│     ├─ public
+│     │  ├─ electron-vite.animate.svg
+│     │  ├─ electron-vite.svg
+│     │  └─ vite.svg
+│     ├─ README.md
+│     ├─ src
+│     │  ├─ app
+│     │  │  ├─ App.css
+│     │  │  └─ App.tsx
+│     │  ├─ assets
+│     │  ├─ components
+│     │  │  ├─ cards
+│     │  │  ├─ navigation
+│     │  │  └─ ui
+│     │  ├─ constants
+│     │  │  ├─ app.ts
+│     │  │  └─ colors.ts
+│     │  ├─ features
+│     │  │  ├─ ai
+│     │  │  ├─ dashboard
+│     │  │  │  ├─ components
+│     │  │  │  │  └─ StatCard.tsx
+│     │  │  │  └─ DashboardPage.tsx
+│     │  │  ├─ gaming
+│     │  │  ├─ monitoring
+│     │  │  ├─ optimizer
+│     │  │  ├─ processes
+│     │  │  └─ settings
+│     │  ├─ hooks
+│     │  ├─ index.css
+│     │  ├─ lib
+│     │  │  ├─ ai.ts
+│     │  │  ├─ electron.ts
+│     │  │  ├─ ipc.ts
+│     │  │  ├─ system.ts
+│     │  │  └─ utils.ts
+│     │  ├─ main.tsx
+│     │  ├─ styles
+│     │  ├─ types
+│     │  ├─ utils
+│     │  └─ vite-env.d.ts
+│     ├─ tsconfig.json
+│     ├─ tsconfig.node.json
+│     └─ vite.config.ts
+├─ docs
+│  ├─ CHANGELOG.md
+│  ├─ plan.odt
+│  └─ ROADMAP.md
+├─ package.json
+├─ packages
+│  ├─ ai
+│  ├─ database
+│  ├─ monitoring
+│  ├─ optimizer
+│  ├─ shared
+│  └─ ui
+└─ README.md
+
+```
