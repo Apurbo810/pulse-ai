@@ -35,6 +35,10 @@ Build a solid desktop application foundation.
 - [ ] Storage Monitoring
 - [ ] Network Monitoring
 - [ ] Refactor monitoring into a shared service
+
+
+### 🚧 Still left
+
 - [ ] Implement dark theme
 - [ ] Polish application layout
 
