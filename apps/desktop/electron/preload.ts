@@ -21,4 +21,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
   // You can expose other APTs you need here.
   // ...
-})
+
+}
+)
+contextBridge.exposeInMainWorld("system", {
+  getCpu: () => ipcRenderer.invoke("system:cpu"),
+  getMemory: () => ipcRenderer.invoke("system:memory"),
+});

@@ -30,15 +30,21 @@ UI Components
         │
         ▼
 Features
+
+
+
 ```
 pulse-ai
 ├─ apps
 │  └─ desktop
 │     ├─ .eslintrc.cjs
+│     ├─ components.json
 │     ├─ electron
 │     │  ├─ electron-env.d.ts
 │     │  ├─ main.ts
-│     │  └─ preload.ts
+│     │  ├─ preload.ts
+│     │  └─ services
+│     │     └─ system.ts
 │     ├─ electron-builder.json5
 │     ├─ index.html
 │     ├─ package-lock.json
@@ -53,13 +59,18 @@ pulse-ai
 │     │  │  ├─ App.css
 │     │  │  └─ App.tsx
 │     │  ├─ assets
+│     │  │  └─ logo
 │     │  ├─ components
 │     │  │  ├─ cards
 │     │  │  ├─ navigation
+│     │  │  │  └─ NavItem.tsx
 │     │  │  └─ ui
+│     │  │     ├─ button.tsx
+│     │  │     └─ card.tsx
 │     │  ├─ constants
 │     │  │  ├─ app.ts
-│     │  │  └─ colors.ts
+│     │  │  ├─ colors.ts
+│     │  │  └─ navigation.ts
 │     │  ├─ features
 │     │  │  ├─ ai
 │     │  │  ├─ dashboard
@@ -88,6 +99,7 @@ pulse-ai
 │     ├─ tsconfig.node.json
 │     └─ vite.config.ts
 ├─ docs
+│  ├─ ARCHITECTURE.md
 │  ├─ CHANGELOG.md
 │  ├─ plan.odt
 │  └─ ROADMAP.md

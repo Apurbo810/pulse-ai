@@ -32,3 +32,26 @@ All notable changes to Pulse AI will be documented in this file.
 ### Changed
 
 - Switched from a manual Electron integration to the Electron + Vite template for a more maintainable development environment.
+
+
+## [0.2.0-dev] - 2026-07-14
+
+### Added
+
+#### System Monitoring
+- Integrated the `systeminformation` library.
+- Created the Electron monitoring service.
+- Added IPC handlers for CPU and memory information.
+- Exposed secure monitoring APIs through the preload script.
+- Added TypeScript definitions for Electron APIs.
+- Connected React to Electron through IPC.
+- Implemented live CPU usage monitoring.
+- Implemented live RAM usage monitoring.
+- Added automatic dashboard refresh every second.
+
+### Architecture
+
+- Separated system monitoring logic from the React renderer.
+- Moved operating system access into the Electron main process.
+- Established the first Electron → IPC → React communication pipeline.
+- Implemented dashboard polling as an initial prototype before extracting a shared monitoring service.

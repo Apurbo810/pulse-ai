@@ -24,19 +24,19 @@ Build a solid desktop application foundation.
 - [x] Create sidebar navigation
 - [x] Create dashboard
 - [x] Create reusable UI components
+- [x] Prepare system monitoring architecture
+- [x] Implement Electron ↔ React IPC communication
+- [x] Display live CPU usage
+- [x] Display live RAM usage
 
-### 🚧 Deferred
+### 🚧 Next
 
-- [ ] Implement dark theme *(after real monitoring data)*
-- [ ] Polish application layout *(after dashboard is functional)*
-
-### 🎯 Current Focus
-
-- [ ] Prepare system monitoring architecture
-- [ ] Create monitoring service
-- [ ] Connect Electron ↔ React via IPC
-- [ ] Display live CPU usage
-- [ ] Display live RAM usage
+- [ ] GPU Monitoring
+- [ ] Storage Monitoring
+- [ ] Network Monitoring
+- [ ] Refactor monitoring into a shared service
+- [ ] Implement dark theme
+- [ ] Polish application layout
 
 ---
 
