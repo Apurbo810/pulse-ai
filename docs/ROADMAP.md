@@ -28,13 +28,15 @@ Build a solid desktop application foundation.
 - [x] Implement Electron ↔ React IPC communication
 - [x] Display live CPU usage
 - [x] Display live RAM usage
+- [x] Display live GPU usage
+- [x] Display total storage usage
+- [x] Display live network upload/download speed
+
 
 ### 🚧 Next
 
-- [ ] GPU Monitoring
-- [ ] Storage Monitoring
-- [ ] Network Monitoring
-- [ ] Refactor monitoring into a shared service
+- [ ] Investigate CPU usage accuracy
+- [ ] Refactor monitoring into a shared monitoring service
 
 
 ### 🚧 Still left
@@ -46,9 +48,12 @@ Build a solid desktop application foundation.
 
 # Week 2 — System Monitoring
 
-- [ ] GPU Monitoring
-- [ ] Storage Monitoring
-- [ ] Network Monitoring
+- [ ] Refactor monitoring service
+- [ ] Monitoring page
+- [ ] Per-drive storage information
+- [ ] Network adapter information
+- [ ] CPU history graphs
+- [ ] RAM history graphs
 
 ---
 

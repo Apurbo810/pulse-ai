@@ -27,4 +27,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 contextBridge.exposeInMainWorld("system", {
   getCpu: () => ipcRenderer.invoke("system:cpu"),
   getMemory: () => ipcRenderer.invoke("system:memory"),
+  getGpu: () => ipcRenderer.invoke("system:gpu"),
+  getStorage: () => ipcRenderer.invoke("system:storage"),
+  getNetwork: () => ipcRenderer.invoke("system:network"),
 });

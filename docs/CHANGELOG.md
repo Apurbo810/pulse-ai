@@ -55,3 +55,41 @@ All notable changes to Pulse AI will be documented in this file.
 - Moved operating system access into the Electron main process.
 - Established the first Electron → IPC → React communication pipeline.
 - Implemented dashboard polling as an initial prototype before extracting a shared monitoring service.
+
+## [0.3.0-dev] - 2026-07-15
+
+### Added
+
+#### System Monitoring
+
+- Implemented live GPU monitoring.
+- Displayed GPU utilization.
+- Displayed GPU model information.
+- Implemented storage monitoring.
+- Calculated total system storage across all drives.
+- Displayed storage utilization percentage.
+- Displayed used and total storage capacity.
+- Implemented live network monitoring.
+- Displayed real-time download speed.
+- Displayed real-time upload speed.
+
+#### Dashboard
+
+- Expanded the dashboard to display five live system metrics:
+  - CPU
+  - RAM
+  - GPU
+  - Storage
+  - Network
+
+### Improved
+
+- Replaced `setInterval()` polling with a controlled asynchronous polling loop.
+- Prevented overlapping monitoring requests.
+- Added polling performance logging for debugging.
+- Improved dashboard responsiveness and eliminated UI freezing.
+
+### Notes
+
+- CPU usage currently differs from Windows Task Manager and requires further investigation.
+- Dashboard polling remains inside the dashboard component and will later be extracted into a shared monitoring service.

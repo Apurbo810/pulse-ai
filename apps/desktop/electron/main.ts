@@ -3,7 +3,7 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { ipcMain } from "electron";
-import { getCpuInfo, getMemoryInfo } from "./services/system";
+import { getCpuInfo, getMemoryInfo,getGpuInfo, getStorageInfo,getNetworkInfo} from "./services/system";
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -76,5 +76,15 @@ app.whenReady().then(() => {
     return await getMemoryInfo();
   });
 
+    ipcMain.handle("system:gpu", async () => {
+    return await getGpuInfo();
+  });
+
+    ipcMain.handle("system:storage", async () => {
+    return await getStorageInfo();
+  });
+  ipcMain.handle("system:network", async () => {
+    return await getNetworkInfo();
+  });
   createWindow();
 });

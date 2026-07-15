@@ -31,7 +31,37 @@ UI Components
         ▼
 Features
 
+## Monitoring Flow
 
+Electron Services
+        │
+        ▼
+systeminformation
+        │
+        ▼
+IPC Main
+        │
+        ▼
+Preload Bridge
+        │
+        ▼
+React Dashboard
+        │
+        ▼
+Stat Cards
+
+
+## Monitoring Modules
+
+- CPU Monitoring
+- Memory Monitoring
+- GPU Monitoring
+- Storage Monitoring
+- Network Monitoring
+
+All monitoring requests currently originate from the Dashboard through IPC polling.
+
+A shared monitoring service will be introduced in a future release to centralize polling and reduce duplicated requests.
 
 ```
 pulse-ai
