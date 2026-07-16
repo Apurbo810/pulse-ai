@@ -1,16 +1,10 @@
-import type { ReactNode } from "react";
+import { Outlet } from "react-router-dom";
 
 import Header from "./Header";
 import MainContent from "./MainContent";
 import Sidebar from "./Sidebar";
 
-interface AppLayoutProps {
-  children: ReactNode;
-}
-
-export default function AppLayout({
-  children,
-}: AppLayoutProps) {
+export default function AppLayout() {
   return (
     <div className="flex h-screen bg-background text-foreground">
       <Sidebar />
@@ -18,7 +12,9 @@ export default function AppLayout({
       <div className="flex flex-1 flex-col">
         <Header />
 
-        <MainContent>{children}</MainContent>
+        <MainContent>
+          <Outlet />
+        </MainContent>
       </div>
     </div>
   );

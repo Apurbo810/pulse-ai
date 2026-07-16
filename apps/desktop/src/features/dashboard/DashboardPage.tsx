@@ -1,56 +1,16 @@
-import {
-  Cpu,
-  HardDrive,
-  MemoryStick,
-  Monitor,
-  Wifi,
-} from "lucide-react";
+import {Cpu,HardDrive, MemoryStick, Monitor, Wifi } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import StatCard from "./components/StatCard";
-
-interface CpuInfo {
-  usage: number;
-}
-
-interface MemoryInfo {
-  total: number;
-  used: number;
-  free: number;
-}
-
-interface GpuInfo {
-  model: string;
-  vendor: string;
-  vram: number;
-  utilization: number;
-}
-
-interface StorageInfo {
-  size: number;
-  used: number;
-  available: number;
-  use: number;
-}
-
-interface NetworkInfo {
-  rx_sec: number;
-  tx_sec: number;
-}
-
+import type {CpuInfo, MemoryInfo, GpuInfo, StorageInfo, NetworkInfo } from "@/types/system";
+import { getSystemSnapshot } from "@/lib/monitor";
 export default function DashboardPage() {
 
 
-  const [cpuUsage, setCpuUsage] = useState(0);
-  const [memoryUsed, setMemoryUsed] = useState(0);
-  const [memoryTotal, setMemoryTotal] = useState(0);
+  const [cpu, setCpu] = useState<CpuInfo>({usage: 0 });
+  const [memory, setMemory] = useState<MemoryInfo>({total: 0, used: 0,free: 0 });
   const [gpu, setGpu] = useState<GpuInfo>({ model: "", vendor: "", vram: 0, utilization: 0, });
-  const [storage, setStorage] = useState<StorageInfo>({
-  size: 0,
-  used: 0,
-  available: 0,
-  use: 0,
-});
+  const [storage, setStorage] = useState<StorageInfo>({size: 0, used: 0, available: 0, use: 0 });
   const [network, setNetwork] = useState<NetworkInfo>({rx_sec: 0,tx_sec: 0, });
   
 useEffect(() => {
@@ -62,23 +22,15 @@ useEffect(() => {
     const start = performance.now();
 
     try {
-      const [cpu, memory, gpuInfo, storageInfo, networkInfo] =
-        await Promise.all([
-          window.system.getCpu(),
-          window.system.getMemory(),
-          window.system.getGpu(),
-          window.system.getStorage(),
-          window.system.getNetwork(),
-        ]);
+      const snapshot = await getSystemSnapshot();
 
       if (cancelled) return;
 
-      setCpuUsage(cpu.usage);
-      setMemoryUsed(memory.used);
-      setMemoryTotal(memory.total);
-      setGpu(gpuInfo);
-      setStorage(storageInfo);
-      setNetwork(networkInfo);
+    setCpu(snapshot.cpu);
+    setMemory(snapshot.memory);
+    setGpu(snapshot.gpu);
+    setStorage(snapshot.storage);
+    setNetwork(snapshot.network);
     } catch (err) {
       console.error(err);
     }
@@ -121,8 +73,8 @@ function formatSpeed(bytes: number) {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
-        <StatCard title="CPU" value={`${cpuUsage}%`} icon={Cpu}/>
-        <StatCard title="RAM" value={`${formatGB(memoryUsed)} / ${formatGB(memoryTotal)} GB`} icon={MemoryStick} />
+        <StatCard title="CPU" value={`${cpu.usage}%`} icon={Cpu}/>
+        <StatCard title="RAM" value={`${formatGB(memory.used)} / ${formatGB(memory.total)} GB`} icon={MemoryStick} />
         <StatCard title="GPU" value={`${gpu.utilization}%`} subtitle={gpu.model} icon={Monitor} />
         <StatCard
           title="Storage"

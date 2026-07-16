@@ -35,14 +35,17 @@ Build a solid desktop application foundation.
 
 ### 🚧 Next
 
-- [ ] Investigate CPU usage accuracy
+
 - [ ] Refactor monitoring into a shared monitoring service
 
 
-### 🚧 Still left
+### 🚧 end of project
 
 - [ ] Implement dark theme
 - [ ] Polish application layout
+
+ #### its work prefect for now
+- [ ] Investigate CPU usage accuracy
 
 ---
 
