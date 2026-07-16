@@ -22,41 +22,40 @@ Build a solid desktop application foundation.
 - [x] Initialize shadcn/ui
 - [x] Build application shell
 - [x] Create sidebar navigation
+- [x] Configure React Router
 - [x] Create dashboard
+- [x] Create monitoring page
 - [x] Create reusable UI components
 - [x] Prepare system monitoring architecture
 - [x] Implement Electron ↔ React IPC communication
+- [x] Create shared monitoring service
 - [x] Display live CPU usage
 - [x] Display live RAM usage
 - [x] Display live GPU usage
 - [x] Display total storage usage
 - [x] Display live network upload/download speed
 
-
-### 🚧 Next
-
-
-- [ ] Refactor monitoring into a shared monitoring service
-
-
-### 🚧 end of project
-
-- [ ] Implement dark theme
-- [ ] Polish application layout
-
- #### its work prefect for now
-- [ ] Investigate CPU usage accuracy
-
 ---
 
-# Week 2 — System Monitoring
+### 🚧 Week 2 — System Monitoring
 
-- [ ] Refactor monitoring service
-- [ ] Monitoring page
-- [ ] Per-drive storage information
+- [ ] Improve CPU usage accuracy
+- [ ] Per-drive storage information (C:, D:, E:, etc.)
+- [ ] Detect SSD / HDD / USB drives
 - [ ] Network adapter information
 - [ ] CPU history graphs
 - [ ] RAM history graphs
+- [ ] GPU history graphs
+- [ ] Disk usage history graphs
+
+---
+
+### 🎨 End of Project
+
+- [ ] Implement dark theme
+- [ ] Polish application layout
+- [ ] Improve animations
+- [ ] UI/UX refinements
 
 ---
 

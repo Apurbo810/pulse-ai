@@ -26,17 +26,20 @@ Electron Preload
 React Renderer
         │
         ▼
-UI Components
+React Router
         │
         ▼
-Features
+Feature Pages
+        │
+        ▼
+Reusable UI Components
 
 ## Monitoring Flow
 
-Electron Services
+systeminformation
         │
         ▼
-systeminformation
+Electron Services
         │
         ▼
 IPC Main
@@ -45,10 +48,17 @@ IPC Main
 Preload Bridge
         │
         ▼
-React Dashboard
+Shared Monitoring Service
         │
         ▼
-Stat Cards
+React Pages
+        │
+        ├──────────────┐
+        ▼              ▼
+Dashboard           Monitoring
+        │
+        ▼
+Reusable UI Components
 
 
 ## Monitoring Modules
@@ -59,9 +69,26 @@ Stat Cards
 - Storage Monitoring
 - Network Monitoring
 
-All monitoring requests currently originate from the Dashboard through IPC polling.
+The shared monitoring service (`monitor.ts`) centralizes system data collection.
 
-A shared monitoring service will be introduced in a future release to centralize polling and reduce duplicated requests.
+Both the Dashboard and Monitoring page consume the same monitoring snapshot through a single API, reducing duplicated IPC requests and preparing the application for future features such as the Process Manager and Gaming Mode.
+Polling is performed by the shared monitoring service, while React components only consume monitoring snapshots.
+
+## Routing
+
+React Router is used for navigation between feature pages.
+
+Current routes:
+
+- /
+- /monitoring
+- /processes
+- /gaming
+- /optimizer
+- /ai
+- /settings
+
+All routes share a common application layout through `AppLayout` and render feature pages using React Router's `Outlet`.
 
 ```
 pulse-ai
@@ -74,7 +101,8 @@ pulse-ai
 │     │  ├─ main.ts
 │     │  ├─ preload.ts
 │     │  └─ services
-│     │     └─ system.ts
+│     │     ├─ system.ts
+│     │     └─ systemMonitor.ts
 │     ├─ electron-builder.json5
 │     ├─ index.html
 │     ├─ package-lock.json
@@ -88,6 +116,7 @@ pulse-ai
 │     │  ├─ app
 │     │  │  ├─ App.css
 │     │  │  └─ App.tsx
+|     |  |  └── router.tsx
 │     │  ├─ assets
 │     │  │  └─ logo
 │     │  ├─ components
@@ -109,20 +138,24 @@ pulse-ai
 │     │  │  │  └─ DashboardPage.tsx
 │     │  │  ├─ gaming
 │     │  │  ├─ monitoring
+│     │  │  │  └─ MonitoringPage.tsx
 │     │  │  ├─ optimizer
 │     │  │  ├─ processes
 │     │  │  └─ settings
 │     │  ├─ hooks
+│     │  │  └─ useSystemMonitor.ts
 │     │  ├─ index.css
 │     │  ├─ lib
 │     │  │  ├─ ai.ts
 │     │  │  ├─ electron.ts
 │     │  │  ├─ ipc.ts
+│     │  │  ├─ monitor.ts
 │     │  │  ├─ system.ts
 │     │  │  └─ utils.ts
 │     │  ├─ main.tsx
 │     │  ├─ styles
 │     │  ├─ types
+│     │  │  └─ system.ts
 │     │  ├─ utils
 │     │  └─ vite-env.d.ts
 │     ├─ tsconfig.json
@@ -133,7 +166,6 @@ pulse-ai
 │  ├─ CHANGELOG.md
 │  ├─ plan.odt
 │  └─ ROADMAP.md
-├─ package.json
 ├─ packages
 │  ├─ ai
 │  ├─ database
@@ -144,3 +176,16 @@ pulse-ai
 └─ README.md
 
 ```
+
+## Planned Architecture
+
+Future features will reuse the shared monitoring service.
+
+Upcoming modules include:
+
+- Process Manager
+- Gaming Mode
+- Optimizer
+- AI Diagnostics
+
+Each feature will remain isolated while sharing common monitoring data through reusable services.

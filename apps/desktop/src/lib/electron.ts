@@ -5,6 +5,9 @@ declare global {
     system: {
       getCpu: () => Promise<{
         usage: number;
+        user: number;
+        system: number;
+        idle: number;
       }>;
 
       getMemory: () => Promise<{

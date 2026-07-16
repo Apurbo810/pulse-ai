@@ -10,7 +10,8 @@ pulse-ai
 │     │  ├─ main.ts
 │     │  ├─ preload.ts
 │     │  └─ services
-│     │     └─ system.ts
+│     │     ├─ system.ts
+│     │     └─ systemMonitor.ts
 │     ├─ electron-builder.json5
 │     ├─ index.html
 │     ├─ package-lock.json
@@ -45,20 +46,24 @@ pulse-ai
 │     │  │  │  └─ DashboardPage.tsx
 │     │  │  ├─ gaming
 │     │  │  ├─ monitoring
+│     │  │  │  └─ MonitoringPage.tsx
 │     │  │  ├─ optimizer
 │     │  │  ├─ processes
 │     │  │  └─ settings
 │     │  ├─ hooks
+│     │  │  └─ useSystemMonitor.ts
 │     │  ├─ index.css
 │     │  ├─ lib
 │     │  │  ├─ ai.ts
 │     │  │  ├─ electron.ts
 │     │  │  ├─ ipc.ts
+│     │  │  ├─ monitor.ts
 │     │  │  ├─ system.ts
 │     │  │  └─ utils.ts
 │     │  ├─ main.tsx
 │     │  ├─ styles
 │     │  ├─ types
+│     │  │  └─ system.ts
 │     │  ├─ utils
 │     │  └─ vite-env.d.ts
 │     ├─ tsconfig.json
@@ -69,7 +74,6 @@ pulse-ai
 │  ├─ CHANGELOG.md
 │  ├─ plan.odt
 │  └─ ROADMAP.md
-├─ package.json
 ├─ packages
 │  ├─ ai
 │  ├─ database

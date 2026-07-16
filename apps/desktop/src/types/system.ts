@@ -1,5 +1,8 @@
 export interface CpuInfo {
   usage: number;
+  user: number;
+  system: number;
+  idle: number;
 }
 
 export interface MemoryInfo {

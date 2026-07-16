@@ -93,3 +93,62 @@ All notable changes to Pulse AI will be documented in this file.
 
 - CPU usage currently differs from Windows Task Manager and requires further investigation.
 - Dashboard polling remains inside the dashboard component and will later be extracted into a shared monitoring service.
+
+## [0.4.0-dev] - 2026-07-16
+
+### Added
+
+#### Routing
+
+- Integrated React Router.
+- Added application router configuration.
+- Implemented nested layouts using `Outlet`.
+- Added route-based navigation.
+- Implemented automatic active navigation highlighting using `NavLink`.
+- Added placeholder routes for application features.
+
+#### Monitoring
+
+- Created a shared monitoring service (`monitor.ts`).
+- Implemented `getSystemSnapshot()` to retrieve all monitoring data through a single API.
+- Centralized CPU, Memory, GPU, Storage and Network polling.
+- Added a dedicated Monitoring page.
+- Displayed detailed CPU information:
+  - Overall usage
+  - User usage
+  - System usage
+  - Idle percentage
+- Displayed detailed memory information.
+- Displayed detailed GPU information.
+- Displayed detailed storage information.
+- Displayed detailed network upload and download speeds.
+
+#### Type Safety
+
+- Moved monitoring interfaces into a shared `types/system.ts` module.
+- Improved type safety across Electron, preload and React.
+
+### Changed
+
+#### Dashboard
+
+- Refactored the dashboard to consume the shared monitoring service.
+- Replaced multiple IPC requests with a single `SystemSnapshot`.
+- Simplified dashboard state management.
+
+#### Architecture
+
+- Separated monitoring logic from UI components.
+- Established a reusable monitoring layer for future features.
+- Prepared the application for Process Manager, Gaming Mode and AI integration.
+
+### Improved
+
+- Reduced duplicated monitoring code.
+- Improved maintainability of the monitoring system.
+- Standardized system data models across the application.
+
+### Known Issues
+
+- CPU usage still differs slightly from Windows Task Manager and requires further investigation.
+- Storage currently displays combined system usage; per-drive (C:, D:, E:, SSD/HDD/USB) monitoring is planned.

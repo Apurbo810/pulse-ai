@@ -9,6 +9,9 @@ export async function getCpuInfo() {
 
   return {
     usage: Math.round(load.currentLoad),
+    user: Math.round(load.currentLoadUser),
+    system: Math.round(load.currentLoadSystem),
+    idle: Math.round(load.currentLoadIdle),
   };
 }
 

@@ -7,7 +7,7 @@ import { getSystemSnapshot } from "@/lib/monitor";
 export default function DashboardPage() {
 
 
-  const [cpu, setCpu] = useState<CpuInfo>({usage: 0 });
+  const [cpu, setCpu] = useState<CpuInfo>({usage: 0, user: 0, system: 0,idle: 0 });
   const [memory, setMemory] = useState<MemoryInfo>({total: 0, used: 0,free: 0 });
   const [gpu, setGpu] = useState<GpuInfo>({ model: "", vendor: "", vram: 0, utilization: 0, });
   const [storage, setStorage] = useState<StorageInfo>({size: 0, used: 0, available: 0, use: 0 });
