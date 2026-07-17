@@ -1,4 +1,5 @@
 import si from "systeminformation";
+import { StorageDevice } from "../../src/types/system";
 
 export async function getCpuInfo() {
   const load = await si.currentLoad();
@@ -39,7 +40,7 @@ export async function getGpuInfo() {
 
 }
 
-    export async function getStorageInfo() {
+  export async function getStorageInfo() {
     const disks = await si.fsSize();
 
     const totalSize = disks.reduce((sum, disk) => sum + disk.size, 0);
@@ -49,23 +50,88 @@ export async function getGpuInfo() {
       0
     );
 
-    const usage = (totalUsed / totalSize) * 100;
-
     return {
       size: totalSize,
       used: totalUsed,
       available: totalAvailable,
-      use: Number(usage.toFixed(1)),
+      use: (totalUsed / totalSize) * 100,
     };
   }
 
-  export async function getNetworkInfo() {
-  const stats = await si.networkStats();
+export async function getStorageDevices(): Promise<StorageDevice[]> {
+  const partitions = await si.fsSize();
+  const disks = await si.diskLayout();
+  const blockDevices = await si.blockDevices();
 
-  const network = stats[0];
+  const diskMap = new Map<string, (typeof disks)[number]>();
 
-  return {
-    rx_sec: network.rx_sec,
-    tx_sec: network.tx_sec,
-  };
+  for (const disk of disks) {
+    diskMap.set(disk.device, disk);
+  }
+
+  const storageMap = new Map<string, StorageDevice>();
+
+  for (const partition of partitions) {
+    const block = blockDevices.find(
+      (b) => b.name === partition.fs
+    );
+
+    if (!block || !block.device) continue;
+
+    const device = block.device;
+
+    const disk = diskMap.get(device);
+
+    if (!disk) continue;
+
+    if (!storageMap.has(disk.device)) {
+      storageMap.set(disk.device, {
+        device: disk.device,
+        model: disk.name,
+        type: disk.type,
+        interfaceType: disk.interfaceType,
+        size: disk.size,
+        partitions: [],
+      });
+    }
+
+    storageMap.get(disk.device)!.partitions.push({
+      letter: partition.fs,
+      size: partition.size,
+      used: partition.used,
+      available: partition.size - partition.used,
+      usage: partition.use,
+    });
+  }
+
+  return [...storageMap.values()];
 }
+
+  export async function getNetworkInfo() {
+    const stats = await si.networkStats();
+    const interfaces = await si.networkInterfaces();
+
+    const network = stats[0];
+
+    if (!network) {
+      return {
+        name: "Unknown",
+        connected: false,
+        speed: 0,
+        ip4: "",
+        upload: 0,
+        download: 0,
+      };
+    }
+
+    const adapter = interfaces.find(i => i.iface === network.iface);
+
+    return {
+      name: adapter?.iface ?? "Unknown",
+      connected: adapter?.operstate === "up",
+      speed: adapter?.speed ?? 0,
+      ip4: adapter?.ip4 ?? "",
+      upload: network.tx_sec,
+      download: network.rx_sec,
+    };
+  }

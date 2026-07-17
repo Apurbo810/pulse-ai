@@ -18,7 +18,7 @@ export interface GpuInfo {
   utilization: number;
 }
 
-export interface StorageInfo {
+export interface StorageSummary {
   size: number;
   used: number;
   available: number;
@@ -26,6 +26,36 @@ export interface StorageInfo {
 }
 
 export interface NetworkInfo {
-  rx_sec: number;
-  tx_sec: number;
+  name: string;
+  connected: boolean;
+  speed: number;
+  ip4: string;
+  upload: number;
+  download: number;
+}
+
+export interface StoragePartition {
+  letter: string;
+
+  size: number;
+
+  used: number;
+
+  available: number;
+
+  usage: number;
+}
+
+export interface StorageDevice {
+  device: string;
+
+  model: string;
+
+  type: string;
+
+  interfaceType: string;
+
+  size: number;
+
+  partitions: StoragePartition[];
 }

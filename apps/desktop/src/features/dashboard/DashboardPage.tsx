@@ -2,7 +2,7 @@ import {Cpu,HardDrive, MemoryStick, Monitor, Wifi } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import StatCard from "./components/StatCard";
-import type {CpuInfo, MemoryInfo, GpuInfo, StorageInfo, NetworkInfo } from "@/types/system";
+import type {CpuInfo, MemoryInfo, GpuInfo, StorageSummary, NetworkInfo } from "@/types/system";
 import { getSystemSnapshot } from "@/lib/monitor";
 export default function DashboardPage() {
 
@@ -10,9 +10,15 @@ export default function DashboardPage() {
   const [cpu, setCpu] = useState<CpuInfo>({usage: 0, user: 0, system: 0,idle: 0 });
   const [memory, setMemory] = useState<MemoryInfo>({total: 0, used: 0,free: 0 });
   const [gpu, setGpu] = useState<GpuInfo>({ model: "", vendor: "", vram: 0, utilization: 0, });
-  const [storage, setStorage] = useState<StorageInfo>({size: 0, used: 0, available: 0, use: 0 });
-  const [network, setNetwork] = useState<NetworkInfo>({rx_sec: 0,tx_sec: 0, });
-  
+  const [storage, setStorage] = useState<StorageSummary>({size: 0, used: 0, available: 0, use: 0 });
+  const [network, setNetwork] = useState<NetworkInfo>({
+    name: "",
+    connected: false,
+    speed: 0,
+    ip4: "",
+    download: 0,
+    upload: 0,
+  });
 useEffect(() => {
   let cancelled = false;
 
@@ -82,7 +88,12 @@ function formatSpeed(bytes: number) {
           subtitle={`${formatGB(storage.used)} / ${formatGB(storage.size)} GB`}
           icon={HardDrive}
         />     
-        <StatCard title="Network" value={`↓ ${formatSpeed(network.rx_sec)}`} subtitle={`↑ ${formatSpeed(network.tx_sec)}`} icon={Wifi} />
+          <StatCard
+            title="Network"
+            value={`↓ ${formatSpeed(network.download)}`}
+            subtitle={`↑ ${formatSpeed(network.upload)}`}
+            icon={Wifi}
+          />   
       </div>
     </div>
   );

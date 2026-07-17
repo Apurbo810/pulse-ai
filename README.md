@@ -25,6 +25,7 @@ pulse-ai
 │     │  ├─ app
 │     │  │  ├─ App.css
 │     │  │  └─ App.tsx
+|     |  |  └── router.tsx
 │     │  ├─ assets
 │     │  │  └─ logo
 │     │  ├─ components
@@ -49,7 +50,22 @@ pulse-ai
 │     │  │  │  └─ MonitoringPage.tsx
 │     │  │  ├─ optimizer
 │     │  │  ├─ processes
-│     │  │  └─ settings
+│     │  │  ├─ settings
+│     │  │  └─ storage
+│     │  │     ├─ components
+│     │  │     │  ├─ DriveCard.tsx
+│     │  │     │  ├─ DriveHeader.tsx
+│     │  │     │  ├─ DriveHealth.tsx
+│     │  │     │  ├─ PartitionTable.tsx
+│     │  │     │  ├─ StorageOverview.tsx
+│     │  │     │  └─ StorageStats.tsx
+│     │  │     ├─ hooks
+│     │  │     │  └─ useStorage.ts
+│     │  │     ├─ pages
+│     │  │     │  ├─ DriveDetailsPage.tsx
+│     │  │     │  └─ StoragePage.tsx
+│     │  │     └─ utils
+│     │  │        └─ format.ts
 │     │  ├─ hooks
 │     │  │  └─ useSystemMonitor.ts
 │     │  ├─ index.css

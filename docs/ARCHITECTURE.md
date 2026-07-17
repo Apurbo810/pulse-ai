@@ -5,9 +5,11 @@
 - Electron
 - React
 - TypeScript
+- React Router
 - Tailwind CSS v4
 - shadcn/ui
 - Lucide React
+- systeminformation
 
 ## Folder Structure
 
@@ -45,34 +47,71 @@ Electron Services
 IPC Main
         │
         ▼
-Preload Bridge
+Electron Preload
         │
         ▼
-Shared Monitoring Service
+Shared Monitoring Service (monitor.ts)
         │
         ▼
-React Pages
+System Snapshot
         │
-        ├──────────────┐
-        ▼              ▼
-Dashboard           Monitoring
-        │
-        ▼
-Reusable UI Components
+        ├───────────────────────┐
+        ▼                       ▼
+     Dashboard               Monitoring
+        │                        │
+        ▼                        ▼      
+Reusable UI Components    Feature Components
+
+        
+
 
 
 ## Monitoring Modules
 
-- CPU Monitoring
-- Memory Monitoring
-- GPU Monitoring
-- Storage Monitoring
-- Network Monitoring
+Implemented:
+
+- CPU
+- Memory
+- GPU
+- Storage Summary
+- Storage Devices & Partitions
+- Network Adapter
+- Network Throughput
 
 The shared monitoring service (`monitor.ts`) centralizes system data collection.
 
-Both the Dashboard and Monitoring page consume the same monitoring snapshot through a single API, reducing duplicated IPC requests and preparing the application for future features such as the Process Manager and Gaming Mode.
-Polling is performed by the shared monitoring service, while React components only consume monitoring snapshots.
+Dashboard and Monitoring consume the same snapshot through a single API, eliminating duplicated IPC calls.
+
+## Storage Architecture
+
+
+Storage is implemented as its own feature module.
+
+Storage
+│
+├── Storage Overview
+├── Physical Drives
+├── Partitions
+└── Drive Details
+
+Electron Services
+        │
+        ▼
+systeminformation
+(fsSize, diskLayout, blockDevices)
+        │
+        ▼
+IPC
+        │
+        ▼
+Preload
+        │
+        ▼
+useStorage()
+        │
+        ▼
+Storage UI
+
 
 ## Routing
 
@@ -89,6 +128,18 @@ Current routes:
 - /settings
 
 All routes share a common application layout through `AppLayout` and render feature pages using React Router's `Outlet`.
+
+## Design Principles
+
+- Feature-first architecture
+- Shared monitoring service
+- Reusable UI components
+- Strong TypeScript typing
+- IPC separation between renderer and Electron
+- Minimal duplicated system calls
+- Scalable module organization
+
+
 
 ```
 pulse-ai
@@ -141,7 +192,22 @@ pulse-ai
 │     │  │  │  └─ MonitoringPage.tsx
 │     │  │  ├─ optimizer
 │     │  │  ├─ processes
-│     │  │  └─ settings
+│     │  │  ├─ settings
+│     │  │  └─ storage
+│     │  │     ├─ components
+│     │  │     │  ├─ DriveCard.tsx
+│     │  │     │  ├─ DriveHeader.tsx
+│     │  │     │  ├─ DriveHealth.tsx
+│     │  │     │  ├─ PartitionTable.tsx
+│     │  │     │  ├─ StorageOverview.tsx
+│     │  │     │  └─ StorageStats.tsx
+│     │  │     ├─ hooks
+│     │  │     │  └─ useStorage.ts
+│     │  │     ├─ pages
+│     │  │     │  ├─ DriveDetailsPage.tsx
+│     │  │     │  └─ StoragePage.tsx
+│     │  │     └─ utils
+│     │  │        └─ format.ts
 │     │  ├─ hooks
 │     │  │  └─ useSystemMonitor.ts
 │     │  ├─ index.css
@@ -187,5 +253,7 @@ Upcoming modules include:
 - Gaming Mode
 - Optimizer
 - AI Diagnostics
+- Performance History
+- System Notifications
 
 Each feature will remain isolated while sharing common monitoring data through reusable services.

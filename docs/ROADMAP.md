@@ -34,15 +34,18 @@ Build a solid desktop application foundation.
 - [x] Display live GPU usage
 - [x] Display total storage usage
 - [x] Display live network upload/download speed
+- [X] Improve CPU usage accuracy
+- [X] Per-drive storage information (C:, D:, E:, etc.)
+- [X] Detect SSD / HDD / USB drives
+- [x] Network adapter information
+
 
 ---
 
 ### 🚧 Week 2 — System Monitoring
 
-- [ ] Improve CPU usage accuracy
-- [ ] Per-drive storage information (C:, D:, E:, etc.)
-- [ ] Detect SSD / HDD / USB drives
-- [ ] Network adapter information
+
+
 - [ ] CPU history graphs
 - [ ] RAM history graphs
 - [ ] GPU history graphs
@@ -50,14 +53,6 @@ Build a solid desktop application foundation.
 
 ---
 
-### 🎨 End of Project
-
-- [ ] Implement dark theme
-- [ ] Polish application layout
-- [ ] Improve animations
-- [ ] UI/UX refinements
-
----
 
 # Week 3 — Process Manager
 
@@ -91,3 +86,13 @@ Build a solid desktop application foundation.
 - [ ] Ollama Integration
 - [ ] AI Diagnostics
 - [ ] AI Recommendations
+
+---
+
+### 🎨 End of Project
+
+- [ ] Implement dark theme
+- [ ] Polish application layout
+- [ ] Improve animations
+- [ ] UI/UX refinements
+

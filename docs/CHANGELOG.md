@@ -152,3 +152,64 @@ All notable changes to Pulse AI will be documented in this file.
 
 - CPU usage still differs slightly from Windows Task Manager and requires further investigation.
 - Storage currently displays combined system usage; per-drive (C:, D:, E:, SSD/HDD/USB) monitoring is planned.
+
+
+## [0.5.0-dev] - 2026-07-17
+
+### Added
+
+#### Storage
+
+- Implemented physical storage device detection.
+- Added SSD, HDD and removable drive identification.
+- Implemented partition discovery for each physical drive.
+- Added storage overview statistics.
+- Created dedicated Storage feature module.
+- Added Storage Overview page.
+- Added Drive Details page.
+- Implemented reusable `useStorage()` hook.
+- Added storage utility helpers for formatting and status calculation.
+- Added storage usage status indicators (Healthy, Warning, Critical).
+- Implemented color-coded storage progress bars.
+
+#### Network
+
+- Expanded network monitoring with adapter information.
+- Added network connection status.
+- Added network link speed.
+- Added local IPv4 address.
+- Continued real-time upload and download monitoring.
+
+#### Monitoring
+
+- Refactored the Monitoring page into reusable feature components:
+  - CpuCard
+  - MemoryCard
+  - GpuCard
+  - StorageCard
+  - NetworkCard
+
+### Changed
+
+#### Dashboard
+
+- Updated dashboard network statistics to use the shared network model.
+- Improved dashboard consistency with the shared monitoring snapshot.
+
+#### Architecture
+
+- Introduced a dedicated Storage feature architecture.
+- Expanded the shared monitoring snapshot with network adapter information.
+- Improved feature modularization by separating monitoring cards into reusable components.
+
+### Improved
+
+- Reduced duplicated monitoring UI code.
+- Improved maintainability through feature-based component organization.
+- Standardized storage and network data models across Electron and React.
+
+### Documentation
+
+- Updated `ARCHITECTURE.md`.
+- Documented the Storage feature architecture.
+- Documented the monitoring pipeline and design principles.

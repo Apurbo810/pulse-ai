@@ -1,13 +1,13 @@
 import {
   LayoutDashboard,
   Activity,
+  HardDrive,
   FolderKanban,
   Gamepad2,
   Wrench,
   Bot,
   Settings,
 } from "lucide-react";
-
 
 
 export const navigation = [
@@ -20,6 +20,11 @@ export const navigation = [
     title: "Monitoring",
     icon: Activity,
     href: "/monitoring",
+  },
+  {
+  title: "Storage",
+  icon: HardDrive,
+  href: "/storage",
   },
   {
     title: "Processes",

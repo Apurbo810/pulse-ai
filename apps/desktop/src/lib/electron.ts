@@ -1,42 +1,28 @@
-export {};
+  import type {
+    CpuInfo,
+    MemoryInfo,
+    GpuInfo,
+    StorageSummary,
+    StorageDevice,
+    NetworkInfo,
+  } from "../types/system";
 
-declare global {
-  interface Window {
-    system: {
-      getCpu: () => Promise<{
-        usage: number;
-        user: number;
-        system: number;
-        idle: number;
-      }>;
+  export {};
 
-      getMemory: () => Promise<{
-        total: number;
-        used: number;
-        free: number;
-      }>;
+  declare global {
+    interface Window {
+      system: {
+        getCpu: () => Promise<CpuInfo>;
 
-      getGpu: () => Promise<{
-        model: string;
-        vendor: string;
-        vram: number;
-        utilization: number;
-      }>;
+        getMemory: () => Promise<MemoryInfo>;
 
-      getStorage: () => Promise<{
+        getGpu: () => Promise<GpuInfo>;
 
-        size: number;
-        used: number;
-        available: number;
-        use: number;
-      }>;
+        getStorage: () => Promise<StorageSummary>;
 
-    getNetwork: () => Promise<{
-      rx_sec: number;
-      tx_sec: number;
-    }>;
+        getStorageDevices: () => Promise<StorageDevice[]>;
 
-    
-    };
+        getNetwork: () => Promise<NetworkInfo>;
+      };
+    }
   }
-}
