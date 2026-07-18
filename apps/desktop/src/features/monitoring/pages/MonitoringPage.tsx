@@ -8,6 +8,9 @@ import MemoryCard from "../components/MemoryCard";
 import GpuCard from "../components/GpuCard";
 import StorageCard from "../components/StorageCard";
 import NetworkCard from "../components/NetworkCard";
+import DiskUsageCard from "../components/DiskUsageCard"
+import DisplayCard from "../components/DisplayCard";
+import DevicesCard from "../components/DevicesCard";
 
 export default function MonitoringPage() {
   const [snapshot, setSnapshot] = useState<SystemSnapshot | null>(null);
@@ -58,25 +61,29 @@ export default function MonitoringPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Monitoring</h1>
 
-        <p className="text-muted-foreground">
-          Detailed system information
-        </p>
-      </div>
+<div className="space-y-8">
+  {/* Header */}
 
+  {/* Performance */}
+  <section className="space-y-4">
+    <h2 className="text-xl font-semibold">Performance</h2>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <CpuCard cpu={snapshot.cpu} />
-        <MemoryCard memory={snapshot.memory} />
-        <GpuCard gpu={snapshot.gpu} />
-        <StorageCard storage={snapshot.storage} />
-        <NetworkCard network={snapshot.network} />
-      </div>
+  <div className="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
+      {/* Performance */}
+      <CpuCard cpu={snapshot.cpu} />
+      <MemoryCard memory={snapshot.memory} />
+      <GpuCard gpu={snapshot.gpu} />
+      <DiskUsageCard storage={snapshot.storage} />
 
+      {/* Hardware */}
+      <NetworkCard network={snapshot.network} />
+      <StorageCard storage={snapshot.storage} />
+      <DisplayCard displays={snapshot.displays} />
+      <DevicesCard devices={snapshot.devices} />
     </div>
+  </section>
+</div>
 
   );
 }

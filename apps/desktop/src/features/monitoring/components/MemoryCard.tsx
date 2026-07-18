@@ -1,4 +1,6 @@
 import { MemoryStick } from "lucide-react";
+import HistoryChart from "./HistoryChart";
+import { useHistory } from "../hooks/useHistory";
 
 import type { MemoryInfo } from "@/types/system";
 
@@ -18,6 +20,9 @@ function formatGB(bytes: number) {
 }
 
 export default function MemoryCard({ memory }: MemoryCardProps) {
+const memoryUsage = (memory.used / memory.total) * 100;
+
+  const memoryHistory = useHistory(memoryUsage);
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -41,6 +46,11 @@ export default function MemoryCard({ memory }: MemoryCardProps) {
           <span>{formatGB(memory.free)} GB</span>
         </div>
       </CardContent>
+              <HistoryChart
+                title="Memory Usage"
+                data={memoryHistory}
+                unit="%"
+              />      
     </Card>
   );
 }

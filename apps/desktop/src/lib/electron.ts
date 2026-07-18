@@ -1,11 +1,15 @@
-  import type {
+import type {
     CpuInfo,
     MemoryInfo,
     GpuInfo,
     StorageSummary,
     StorageDevice,
     NetworkInfo,
+    DisplayInfo,
+    DevicesInfo,
   } from "../types/system";
+
+
 
   export {};
 
@@ -23,6 +27,11 @@
         getStorageDevices: () => Promise<StorageDevice[]>;
 
         getNetwork: () => Promise<NetworkInfo>;
+
+
+        getDisplayInfo: () => Promise<DisplayInfo[]>;
+
+        getDevices: () => Promise<DevicesInfo>;
       };
     }
   }

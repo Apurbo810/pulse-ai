@@ -1,12 +1,15 @@
 import si from "systeminformation";
 import { StorageDevice } from "../../src/types/system";
 
+
+export interface InputDevice {
+  type: "Keyboard" | "Mouse" | "Gamepad" | "Unknown";
+  manufacturer: string;
+  product: string;
+}
+
 export async function getCpuInfo() {
   const load = await si.currentLoad();
-
-  console.log(load.currentLoad);
-  console.log(load.currentLoadUser);
-  console.log(load.currentLoadSystem);
 
   return {
     usage: Math.round(load.currentLoad),
@@ -135,3 +138,16 @@ export async function getStorageDevices(): Promise<StorageDevice[]> {
       download: network.rx_sec,
     };
   }
+
+  export async function getDisplayInfo() {
+    const graphics = await si.graphics();
+
+    return graphics.displays.map((display) => ({
+      model: display.model,
+      vendor: display.vendor,
+      main: display.main,
+      resolution: `${display.currentResX} × ${display.currentResY}`,
+      refreshRate: display.currentRefreshRate,
+    }));
+  }
+

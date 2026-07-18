@@ -1,6 +1,8 @@
 import { Cpu } from "lucide-react";
 
 import type { CpuInfo } from "@/types/system";
+import HistoryChart from "./HistoryChart";
+import { useHistory } from "../hooks/useHistory";
 
 import {
   Card,
@@ -14,6 +16,8 @@ interface CpuCardProps {
 }
 
 export default function CpuCard({ cpu }: CpuCardProps) {
+
+  const cpuHistory = useHistory(cpu.usage);
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -41,7 +45,13 @@ export default function CpuCard({ cpu }: CpuCardProps) {
           <span>Idle</span>
           <span>{cpu.idle}%</span>
         </div>
+      <HistoryChart
+        title="CPU Usage"
+        data={cpuHistory}
+        unit="%"
+      />
       </CardContent>
+
     </Card>
   );
 }

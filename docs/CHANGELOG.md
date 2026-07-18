@@ -213,3 +213,51 @@ All notable changes to Pulse AI will be documented in this file.
 - Updated `ARCHITECTURE.md`.
 - Documented the Storage feature architecture.
 - Documented the monitoring pipeline and design principles.
+
+
+## [0.6.0-dev] - 2026-07-18
+
+### Added
+
+#### Monitoring
+
+- Implemented display detection.
+- Displayed monitor model information.
+- Displayed display resolution.
+- Displayed refresh rate.
+- Displayed monitor connection type.
+- Implemented keyboard detection.
+- Implemented mouse detection.
+- Added reusable Devices monitoring card.
+- Added performance history charts for CPU, Memory, GPU and Disk usage.
+
+#### Electron
+
+- Added dedicated device detection service (`devices.ts`).
+- Added IPC handlers for display and input device information.
+- Extended the preload API for device monitoring.
+
+### Changed
+
+#### Monitoring
+
+- Expanded the shared `SystemSnapshot` with:
+  - Display information
+  - Keyboard information
+  - Mouse information
+
+#### Architecture
+
+- Integrated Windows PowerShell–based device detection into the monitoring pipeline.
+- Continued consolidating monitoring data through the shared `SystemSnapshot`.
+
+### Improved
+
+- Expanded hardware monitoring beyond core system metrics.
+- Improved modularity by separating device detection into its own Electron service.
+
+### Documentation
+
+- Updated `ARCHITECTURE.md`.
+- Documented display and device monitoring.
+- Updated the project structure documentation.

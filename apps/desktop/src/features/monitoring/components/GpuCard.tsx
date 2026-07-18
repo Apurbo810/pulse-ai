@@ -1,6 +1,8 @@
 import { Monitor } from "lucide-react";
 
 import type { GpuInfo } from "@/types/system";
+import HistoryChart from "./HistoryChart";
+import { useHistory } from "../hooks/useHistory";
 
 import {
   Card,
@@ -13,7 +15,10 @@ interface GpuCardProps {
   gpu: GpuInfo;
 }
 
+
 export default function GpuCard({ gpu }: GpuCardProps) {
+
+  const gpuHistory = useHistory(gpu.utilization);
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -41,6 +46,11 @@ export default function GpuCard({ gpu }: GpuCardProps) {
           <span>Usage</span>
           <span>{gpu.utilization}%</span>
         </div>
+              <HistoryChart
+                title="Gpu Usage"
+                data={gpuHistory}
+                unit="%"
+              />
       </CardContent>
     </Card>
   );

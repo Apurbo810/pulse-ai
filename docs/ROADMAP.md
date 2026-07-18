@@ -12,6 +12,13 @@
 
 Build a solid desktop application foundation.
 
+### 🚧 Week 2 — System Monitoring 
+
+done
+
+---
+
+
 ### ✅ Completed
 
 - [x] Create GitHub repository
@@ -38,20 +45,16 @@ Build a solid desktop application foundation.
 - [X] Per-drive storage information (C:, D:, E:, etc.)
 - [X] Detect SSD / HDD / USB drives
 - [x] Network adapter information
-
-
----
-
-### 🚧 Week 2 — System Monitoring
-
-
-
-- [ ] CPU history graphs
-- [ ] RAM history graphs
-- [ ] GPU history graphs
-- [ ] Disk usage history graphs
+- [x] Display detection
+- [x] Input device detection (Keyboard & Mouse)
+- [x] CPU history graphs
+- [x] RAM history graphs
+- [x] GPU history graphs
+- [x] Disk usage history graphs
 
 ---
+
+
 
 
 # Week 3 — Process Manager
@@ -64,6 +67,9 @@ Build a solid desktop application foundation.
 
 ---
 
+
+
+
 # Week 4 — Gaming Mode
 
 - [ ] Game Detection
@@ -72,7 +78,18 @@ Build a solid desktop application foundation.
 
 ---
 
-# Week 5 — Optimizer
+# Week 5 — Advanced System Monitoring 
+
+
+- [ ] Monitor temperature (CPU/GPU)
+- [ ] Monitor fan speeds
+- [ ] Battery information (laptops)
+- [ ] Real-time FPS monitoring
+
+---
+
+
+# Week 6 — Optimizer
 
 - [ ] Clean Temporary Files
 - [ ] Flush DNS
@@ -81,7 +98,7 @@ Build a solid desktop application foundation.
 
 ---
 
-# Week 6 — AI Integration
+# Week 7 — AI Integration
 
 - [ ] Ollama Integration
 - [ ] AI Diagnostics

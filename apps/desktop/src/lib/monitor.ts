@@ -2,33 +2,54 @@ import type {
   CpuInfo,
   MemoryInfo,
   GpuInfo,
-  StorageInfo,
+  StorageSummary,
   NetworkInfo,
+  DisplayInfo,
+  DevicesInfo,
 } from "@/types/system";
 
 export interface SystemSnapshot {
   cpu: CpuInfo;
   memory: MemoryInfo;
   gpu: GpuInfo;
-  storage: StorageInfo;
+  storage: StorageSummary;
   network: NetworkInfo;
+  displays: DisplayInfo[];
+  devices: DevicesInfo;
 }
 
 export async function getSystemSnapshot(): Promise<SystemSnapshot> {
-  const [cpu, memory, gpu, storage, network] = await Promise.all([
+  const [cpu, memory, gpu, storage, network, displays, devices,] = await Promise.all([
     window.system.getCpu(),
     window.system.getMemory(),
     window.system.getGpu(),
     window.system.getStorage(),
     window.system.getNetwork(),
-  ]);
+    window.system.getDisplayInfo(),
+    window.system.getDevices(),
 
+  ]);
+const snapshot = {
+  cpu,
+  memory,
+  gpu,
+  storage,
+  network,
+  displays,
+  devices,
+};
+
+console.log(snapshot);
+
+return snapshot;
   return {
     cpu,
     memory,
     gpu,
     storage,
     network,
+    displays,
+    devices
   };
 }
 

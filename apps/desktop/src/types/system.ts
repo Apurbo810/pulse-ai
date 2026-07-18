@@ -59,3 +59,27 @@ export interface StorageDevice {
 
   partitions: StoragePartition[];
 }
+
+
+export interface DisplayInfo {
+  model: string;
+  vendor: string;
+  main: boolean;
+  resolution: string;
+  refreshRate: number;
+}
+
+export interface KeyboardDevice {
+  name: string;
+  manufacturer: string;
+}
+
+export interface MouseDevice {
+  name: string;
+  manufacturer: string;
+}
+
+export interface DevicesInfo {
+  keyboards: KeyboardDevice[];
+  mice: MouseDevice[];
+}
