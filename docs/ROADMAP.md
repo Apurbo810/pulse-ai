@@ -12,9 +12,7 @@
 
 Build a solid desktop application foundation.
 
-### 🚧 Week 2 — System Monitoring 
-
-done
+# Week 2 — System Monitoring (Completed) ✅
 
 ---
 
@@ -57,13 +55,81 @@ done
 
 
 
-# Week 3 — Process Manager
+# Phase 3 — Process Manager
 
-- [ ] Process List
-- [ ] Search
-- [ ] Sort
-- [ ] Kill Process
+**Status:** In Progress 🚧
+
+> Build a modern and safe Windows Process Manager with real-time monitoring, process management, and AI-powered diagnostics.
+
+---
+
+## 🚧 Phase 3.1 — Core Process Manager
+
+- [x] Display running processes
+- [x] Live CPU usage per process
+- [x] Live Memory usage per process
+- [x] Live GPU usage per process
+- [x] Live Disk I/O per process
+- [x] Process status indicator
+- [x] Process details panel
+- [x] Executable path display
+- [x] Refresh process list
+- [x] Expand/collapse process rows
+- [x] Search processes
+---
+
+## 🚧 Phase 3.2 — Process Management
+
+
+- [ ] Sort by Name
+- [ ] Sort by CPU
+- [ ] Sort by GPU
+- [ ] Sort by Memory
+- [ ] Sort by Disk
+- [ ] Sort by PID
+
+- [ ] Filter Desktop Applications
+- [ ] Filter Background Processes
+- [ ] Filter Windows Processes
+- [ ] Filter Services
+
+- [ ] Auto Refresh Interval
+- [ ] Remember user preferences
+
+---
+
+## 🚧 Phase 3.3 — Process Actions
+
+- [ ] End Task
+- [ ] Prevent termination of critical Windows processes
+- [ ] Confirmation dialog before ending a process
 - [ ] Open File Location
+- [ ] Copy Executable Path
+- [ ] Open Process Properties
+
+---
+
+## 🚧 Phase 3.4 — Process Intelligence
+
+- [ ] Display process PID
+- [ ] Display process owner
+- [ ] Display process priority
+- [ ] Display process start time
+- [ ] Display command line arguments
+- [ ] Detect application publisher
+- [ ] Detect application icons
+
+---
+
+## 🚧 Phase 3.5 — Pulse AI Analysis
+
+- [ ] Analyze high CPU usage
+- [ ] Analyze high Memory usage
+- [ ] Analyze GPU bottlenecks
+- [ ] Analyze Disk bottlenecks
+- [ ] Detect suspicious processes
+- [ ] AI optimization recommendations
+
 
 ---
 

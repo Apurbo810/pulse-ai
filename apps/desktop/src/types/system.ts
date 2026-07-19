@@ -83,3 +83,16 @@ export interface DevicesInfo {
   keyboards: KeyboardDevice[];
   mice: MouseDevice[];
 }
+
+
+export interface ProcessInfo {
+  pid: number;
+  name: string;
+  cpu: number;
+  memory: number;
+  executablePath: string | null;
+
+  gpu?: number;
+  disk?: number;
+  status?: "Running" | "Suspended" | "Not Responding";
+}

@@ -34,4 +34,5 @@ contextBridge.exposeInMainWorld("system", {
   getDisplayInfo: () => ipcRenderer.invoke("system:getDisplayInfo"),
   getInputDevices: () =>ipcRenderer.invoke("system:getInputDevices"),
   getDevices: () => ipcRenderer.invoke("system:getDevices"),
+  getProcesses: () => ipcRenderer.invoke("process:getAll"),
 });

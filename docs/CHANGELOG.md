@@ -261,3 +261,57 @@ All notable changes to Pulse AI will be documented in this file.
 - Updated `ARCHITECTURE.md`.
 - Documented display and device monitoring.
 - Updated the project structure documentation.
+
+
+## [0.7.0-dev] - 2026-07-19
+
+### Added
+
+#### Process Manager
+
+- Implemented the Process Manager feature.
+- Displayed all running processes.
+- Displayed live CPU usage per process.
+- Displayed live memory usage per process.
+- Displayed live GPU usage per process.
+- Displayed live disk I/O per process.
+- Displayed process status.
+- Added expandable process details panel.
+- Displayed executable path for each process.
+- Added manual process list refresh.
+- Implemented process search by:
+  - Process name
+  - Process ID (PID)
+  - Executable path
+
+#### Electron
+
+- Added dedicated process monitoring service (`process.ts`).
+- Added IPC handlers for process monitoring.
+- Extended the preload API with process monitoring methods.
+
+### Changed
+
+#### Monitoring
+
+- Added Windows Performance Counter integration for per-process GPU utilization.
+- Added Windows Performance Counter integration for per-process disk I/O monitoring.
+- Combined `systeminformation` and Windows Performance Counters into a unified process monitoring pipeline.
+
+#### Architecture
+
+- Introduced the Process Manager feature module.
+- Extended the Electron service layer to support process monitoring.
+- Maintained feature-first architecture by isolating process monitoring logic from the renderer.
+
+### Improved
+
+- Reduced duplicated process filtering logic through the `useProcesses()` hook.
+- Improved process list usability with instant client-side searching.
+- Improved modularity by separating process UI into reusable components.
+
+### Documentation
+
+- Updated `ROADMAP.md`.
+- Updated `ARCHITECTURE.md`.
+- Documented the Process Manager architecture.  

@@ -5,6 +5,7 @@ import path from 'node:path'
 import { ipcMain } from "electron";
 import { getCpuInfo, getMemoryInfo,getGpuInfo, getStorageInfo,getNetworkInfo,getStorageDevices,getDisplayInfo } from "./services/system";
 import { getDevices } from "./services/devices";
+import { getProcesses } from "./services/process";
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -100,6 +101,8 @@ app.whenReady().then(() => {
     return getDevices();
   });
 
-
+    ipcMain.handle("process:getAll", async () => {
+    return getProcesses();
+  });
   createWindow();
 });

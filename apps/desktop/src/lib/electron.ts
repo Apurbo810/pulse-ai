@@ -7,6 +7,7 @@ import type {
     NetworkInfo,
     DisplayInfo,
     DevicesInfo,
+    ProcessInfo,
   } from "../types/system";
 
 
@@ -32,6 +33,8 @@ import type {
         getDisplayInfo: () => Promise<DisplayInfo[]>;
 
         getDevices: () => Promise<DevicesInfo>;
+
+        getProcesses: () => Promise<ProcessInfo[]>;
       };
     }
   }

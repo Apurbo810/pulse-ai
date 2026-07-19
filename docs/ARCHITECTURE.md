@@ -1,6 +1,5 @@
         # Pulse AI Architecture
 
-        Tech Stack
         Electron
         React
         TypeScript
@@ -9,11 +8,12 @@
         shadcn/ui
         Lucide React
         systeminformation
-        PowerShell (Windows Device Detection)
+        PowerShell (Windows Performance Counters)
+
 
         ## Project Overview
 
-        Pulse AI is a Windows-first desktop application built with Electron and React.
+        Pulse AI is a Windows-first desktop application designed to monitor, diagnose, and optimize system performance through a modular, feature-first architecture.
         Its goal is to monitor, diagnose, and optimize system performance through a modular,
         feature-first architecture. The application centralizes system monitoring into a
         shared pipeline that supplies data to multiple features while minimizing duplicated
@@ -28,55 +28,52 @@
         ## Architecture
 
 
-                        Electron Main Process
-                                │
-                                ▼
-                        Electron Services
-                                │
-                                ▼
-                        IPC Main
-                                │
-                                ▼
-                Electron Preload
-                                │
-                                ▼
-                        React Renderer
-                                │
-                                ▼
-                        React Router
-                                │
-                                ▼
-                        Feature Modules
-                                │
-                                ▼
-                Reusable UI Components
+Electron Main Process
+        │
+        ▼
+Electron Services
+        │
+        ▼
+IPC Main
+        │
+        ▼
+Preload API
+        │
+        ▼
+React Renderer
+        │
+        ▼
+React Router
+        │
+        ▼
+Feature Modules
+        │
+        ▼
+Reusable Components
+
 
         ## Monitoring Flow
 
-        systeminformation
-                │
-                ▼
-        Electron Services
-                │
-                ▼
+systeminformation
+        │
+        ▼
+Electron Services
+        │
+        ├───────────────┐
+        ▼               ▼
+Windows Performance   systeminformation
+Counters              APIs
+(PowerShell)
+        │               │
+        └──────┬────────┘
+               ▼
         IPC Main
-                │
-                ▼
+               ▼
         Preload API
-                │
-                ▼
+               ▼
         monitor.ts
-                │
-                ▼
+               ▼
         SystemSnapshot
-                │
-        ┌──────┴─────────────┐
-        ▼                    ▼
-        Dashboard        Monitoring
-        │                    │
-        └──────────┬─────────┘
-                ▼
-        Shared Components
 
         ## Monitoring Modules
 
@@ -93,7 +90,7 @@
         - Display Detection
         - Keyboard Detection
         - Mouse Detection
-        - Performance History
+        - Performance History Graphs
 
         The shared monitoring service (`monitor.ts`) centralizes system data collection.
 
@@ -154,11 +151,14 @@
         - Strong TypeScript typing
         - IPC separation between renderer and Electron
         - Minimal duplicated system calls
+        - Modular feature isolation
+        - Single source of truth for system data
         - Scalable module organization
 
-
+     
         ```
         pulse-ai
+        ├─ .agents
         ├─ apps
         │  └─ desktop
         │     ├─ .eslintrc.cjs
@@ -170,8 +170,8 @@
         │     │  ├─ process.ts
         │     │  └─ services
         │     │     ├─ devices.ts
-        │     │     ├─ system.ts
-        │     │     └─ systemMonitor.ts
+        │     │     ├─ process.ts
+        │     │     └─ system.ts
         │     ├─ electron-builder.json5
         │     ├─ index.html
         │     ├─ package-lock.json
@@ -196,7 +196,9 @@
         │     │  │     ├─ button.tsx
         │     │  │     ├─ card.tsx
         │     │  │     ├─ chart.tsx
-        │     │  │     └─ progress.tsx
+        │     │  │     ├─ input.tsx
+        │     │  │     ├─ progress.tsx
+        │     │  │     └─ table.tsx
         │     │  ├─ constants
         │     │  │  ├─ app.ts
         │     │  │  ├─ colors.ts
@@ -211,11 +213,11 @@
         │     │  │  ├─ monitoring
         │     │  │  │  ├─ components
         │     │  │  │  │  ├─ CpuCard.tsx
+        │     │  │  │  │  ├─ DevicesCard.tsx
         │     │  │  │  │  ├─ DiskUsageCard.tsx
         │     │  │  │  │  ├─ DisplayCard.tsx
         │     │  │  │  │  ├─ GpuCard.tsx
         │     │  │  │  │  ├─ HistoryChart.tsx
-        │     │  │  │  │  ├─ InputDevicesCard.tsx
         │     │  │  │  │  ├─ MemoryCard.tsx
         │     │  │  │  │  ├─ NetworkCard.tsx
         │     │  │  │  │  └─ StorageCard.tsx
@@ -225,6 +227,14 @@
         │     │  │  │     └─ MonitoringPage.tsx
         │     │  │  ├─ optimizer
         │     │  │  ├─ processes
+        │     │  │  │  ├─ components
+        │     │  │  │  │  ├─ ProcessDetails.tsx
+        │     │  │  │  │  ├─ ProcessRow.tsx
+        │     │  │  │  │  ├─ ProcessTable.tsx
+        │     │  │  │  │  └─ ProcessToolbar.tsx
+        │     │  │  │  ├─ hooks
+        │     │  │  │  │  └─ useProcesses.ts
+        │     │  │  │  └─ ProcessesPage.tsx
         │     │  │  ├─ settings
         │     │  │  ├─ shared
         │     │  │  │  └─ utils
@@ -259,7 +269,8 @@
         │     │  └─ vite-env.d.ts
         │     ├─ tsconfig.json
         │     ├─ tsconfig.node.json
-        │     └─ vite.config.ts
+        │     ├─ vite.config.ts
+        │     └─ vite.config.ts.timestamp-1784449007718-571f3bd1253da.mjs
         ├─ docs
         │  ├─ ARCHITECTURE.md
         │  ├─ CHANGELOG.md
@@ -280,13 +291,18 @@
 
         Future features will reuse the shared monitoring service.
 
+        Implemented modules
+
+        - Dashboard
+        - Monitoring
+        - Storage
+        - Process Manager
+
         Upcoming modules include:
 
-        - Process Manager
         - Gaming Mode
         - Optimizer
         - AI Diagnostics
-        - Performance History
         - System Notifications
 
         Each feature will remain isolated while sharing common monitoring data through reusable services.
