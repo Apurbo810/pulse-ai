@@ -1,6 +1,7 @@
 import { useProcesses } from "./hooks/useProcesses";
 import ProcessToolbar from "./components/ProcessToolbar";
 import ProcessTable from "./components/ProcessTable";
+import ProcessFilterBar from "./components/ProcessFilterBar";
 
 export default function ProcessesPage() {
   const {
@@ -10,9 +11,13 @@ export default function ProcessesPage() {
     refresh,
     search,
     setSearch,
+
     sortField,
     sortDirection,
     toggleSort,
+
+    filter,
+    setFilter,
   } = useProcesses();
 
   return (
@@ -23,6 +28,11 @@ export default function ProcessesPage() {
         search={search}
         onSearchChange={setSearch}
         onRefresh={refresh}
+      />
+      
+      <ProcessFilterBar
+        filter={filter}
+        onFilterChange={setFilter}
       />
 
       <ProcessTable

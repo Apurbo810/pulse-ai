@@ -6,7 +6,7 @@ import {
 } from "react";
 
 import type { ProcessInfo } from "../../../types/system";
-import type { SortDirection, SortField } from "../types";
+import type { ProcessFilter, SortDirection, SortField } from "../types";
 
 export function useProcesses() {
   const [processes, setProcesses] = useState<ProcessInfo[]>([]);
@@ -20,6 +20,9 @@ export function useProcesses() {
 
   const [sortDirection, setSortDirection] =
     useState<SortDirection>("desc");
+
+  const [filter, setFilter] =
+    useState<ProcessFilter>("all");
 
   const refresh = useCallback(async () => {
     try {
@@ -55,19 +58,54 @@ export function useProcesses() {
     return () => clearInterval(interval);
   }, [refresh]);
 
-  const filteredProcesses = useMemo(() => {
-    const query = search.trim().toLowerCase();
+const searchedProcesses = useMemo(() => {
+  const query = search.trim().toLowerCase();
 
-    if (!query) return processes;
+  if (!query) return processes;
 
-    return processes.filter((process) => {
-      return (
-        process.name.toLowerCase().includes(query) ||
-        process.pid.toString().includes(query) ||
-        (process.executablePath?.toLowerCase().includes(query) ?? false)
+  return processes.filter((process) => {
+    return (
+      process.name.toLowerCase().includes(query) ||
+      process.pid.toString().includes(query) ||
+      (process.executablePath?.toLowerCase().includes(query) ?? false)
+    );
+  });
+}, [processes, search]);
+
+const filteredProcesses = useMemo(() => {
+  switch (filter) {
+    case "apps":
+      return searchedProcesses.filter(
+        (p) =>
+          !!p.executablePath &&
+          !p.name.toLowerCase().startsWith("svchost")
       );
-    });
-  }, [processes, search]);
+
+    case "windows":
+      return searchedProcesses.filter((p) =>
+        p.executablePath?.toLowerCase().includes("windows")
+      );
+
+    case "background":
+      return searchedProcesses.filter(
+        (p) =>
+          p.name.toLowerCase().startsWith("svchost") ||
+          p.name.toLowerCase().startsWith("runtimebroker")
+      );
+
+    case "services":
+      return searchedProcesses.filter((p) =>
+        p.name.toLowerCase().includes("service")
+      );
+
+    default:
+      return searchedProcesses;
+  }
+}, [searchedProcesses, filter]);
+
+  
+
+
 
   const sortedProcesses = useMemo(() => {
     const sorted = [...filteredProcesses];
@@ -117,5 +155,8 @@ export function useProcesses() {
     sortField,
     sortDirection,
     toggleSort,
+
+    filter,
+    setFilter,
   };
 }

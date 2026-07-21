@@ -8,6 +8,7 @@ import type {
     DisplayInfo,
     DevicesInfo,
     ProcessInfo,
+    
   } from "../types/system";
 
 
@@ -35,6 +36,8 @@ import type {
         getDevices: () => Promise<DevicesInfo>;
 
         getProcesses: () => Promise<ProcessInfo[]>;
+
+        getFileIcon(path: string): Promise<string | null>;
       };
     }
   }

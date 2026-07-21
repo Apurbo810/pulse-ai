@@ -7,3 +7,10 @@ export type SortField =
   | "pid";
 
 export type SortDirection = "asc" | "desc";
+
+export type ProcessFilter =
+  | "all"
+  | "apps"
+  | "background"
+  | "windows"
+  | "services";

@@ -10,9 +10,9 @@ pulse-ai
 │     │  ├─ electron-env.d.ts
 │     │  ├─ main.ts
 │     │  ├─ preload.ts
-│     │  ├─ process.ts
 │     │  └─ services
 │     │     ├─ devices.ts
+│     │     ├─ icon.ts
 │     │     ├─ process.ts
 │     │     └─ system.ts
 │     ├─ electron-builder.json5
@@ -28,7 +28,6 @@ pulse-ai
 │     │  ├─ app
 │     │  │  ├─ App.css
 │     │  │  └─ App.tsx
-|     |  |  └── router.tsx
 │     │  ├─ assets
 │     │  │  └─ logo
 │     │  ├─ components
@@ -72,12 +71,16 @@ pulse-ai
 │     │  │  ├─ processes
 │     │  │  │  ├─ components
 │     │  │  │  │  ├─ ProcessDetails.tsx
+│     │  │  │  │  ├─ ProcessFilterBar.tsx
+│     │  │  │  │  ├─ ProcessIcon.tsx
 │     │  │  │  │  ├─ ProcessRow.tsx
 │     │  │  │  │  ├─ ProcessTable.tsx
-│     │  │  │  │  └─ ProcessToolbar.tsx
+│     │  │  │  │  ├─ ProcessToolbar.tsx
+│     │  │  │  │  └─ SortableHeader.tsx
 │     │  │  │  ├─ hooks
 │     │  │  │  │  └─ useProcesses.ts
-│     │  │  │  └─ ProcessesPage.tsx
+│     │  │  │  ├─ ProcessesPage.tsx
+│     │  │  │  └─ types.ts
 │     │  │  ├─ settings
 │     │  │  ├─ shared
 │     │  │  │  └─ utils

@@ -35,4 +35,8 @@ contextBridge.exposeInMainWorld("system", {
   getInputDevices: () =>ipcRenderer.invoke("system:getInputDevices"),
   getDevices: () => ipcRenderer.invoke("system:getDevices"),
   getProcesses: () => ipcRenderer.invoke("process:getAll"),
+
+
+  getFileIcon: (path: string) =>
+    ipcRenderer.invoke("system:getFileIcon", path),
 });

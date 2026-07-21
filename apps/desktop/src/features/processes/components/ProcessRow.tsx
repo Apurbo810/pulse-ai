@@ -1,5 +1,6 @@
+import { ChevronDown, ChevronRight } from "lucide-react";
+import ApplicationIcon from "@/components/shared/ApplicationIcon";
 import type { ProcessInfo } from "@/types/system";
-import { AppWindow, ChevronDown, ChevronRight } from "lucide-react";
 
 import {
   TableCell,
@@ -44,13 +45,22 @@ export default function ProcessRow({
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             )}
 
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
-              <AppWindow className="h-4 w-4 text-muted-foreground" />
-            </div>
+            <ApplicationIcon
+              executablePath={process.executablePath}
+              size={24}
+            />
 
-            <span className="font-medium">
-              {process.name}
-            </span>
+            <div className="min-w-0">
+              <p className="truncate font-medium">
+                {process.name}
+              </p>
+
+              {process.executablePath && (
+                <p className="truncate text-xs text-muted-foreground">
+                  {process.executablePath}
+                </p>
+              )}
+            </div>
           </div>
         </TableCell>
 
