@@ -10,10 +10,14 @@ export default function ProcessesPage() {
     refresh,
     search,
     setSearch,
+    sortField,
+    sortDirection,
+    toggleSort,
   } = useProcesses();
 
   return (
     <div className="p-6 space-y-6">
+
       <ProcessToolbar
         processCount={processes.length}
         search={search}
@@ -24,7 +28,12 @@ export default function ProcessesPage() {
       <ProcessTable
         processes={filteredProcesses}
         loading={loading}
+        sortField={sortField}
+        sortDirection={sortDirection}
+        onSort={toggleSort}
       />
+
+      
     </div>
   );
 }
