@@ -81,17 +81,17 @@ Build a solid desktop application foundation.
 ## 🚧 Phase 3.2 — Process Management
 
 
-- [ ] Sort by Name
-- [ ] Sort by CPU
-- [ ] Sort by GPU
-- [ ] Sort by Memory
-- [ ] Sort by Disk
-- [ ] Sort by PID
+- [x] Sort by Name
+- [x] Sort by CPU
+- [x] Sort by GPU
+- [x] Sort by Memory
+- [x] Sort by Disk
+- [x] Sort by PID
 
-- [ ] Filter Desktop Applications
-- [ ] Filter Background Processes
-- [ ] Filter Windows Processes
-- [ ] Filter Services
+- [x] Filter Desktop Applications
+- [x] Filter Background Processes
+- [x] Filter Windows Processes
+- [x] Filter Services
 
 - [ ] Auto Refresh Interval
 - [ ] Remember user preferences
