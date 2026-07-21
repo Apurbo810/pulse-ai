@@ -36,30 +36,20 @@ export interface NetworkInfo {
 
 export interface StoragePartition {
   letter: string;
-
   size: number;
-
   used: number;
-
   available: number;
-
   usage: number;
 }
 
 export interface StorageDevice {
   device: string;
-
   model: string;
-
   type: string;
-
   interfaceType: string;
-
   size: number;
-
   partitions: StoragePartition[];
 }
-
 
 export interface DisplayInfo {
   model: string;
@@ -83,7 +73,6 @@ export interface DevicesInfo {
   keyboards: KeyboardDevice[];
   mice: MouseDevice[];
 }
-
 
 export interface ProcessInfo {
   pid: number;

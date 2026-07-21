@@ -38,6 +38,8 @@ import type {
         getProcesses: () => Promise<ProcessInfo[]>;
 
         getFileIcon(path: string): Promise<string | null>;
+
+        openFileLocation(path: string): Promise<void>;
       };
     }
   }

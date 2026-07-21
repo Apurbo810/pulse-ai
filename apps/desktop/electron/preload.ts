@@ -1,42 +1,47 @@
-import { ipcRenderer, contextBridge } from 'electron'
+  import { ipcRenderer, contextBridge } from 'electron'
 
-// --------- Expose some API to the Renderer process ---------
-contextBridge.exposeInMainWorld('ipcRenderer', {
-  on(...args: Parameters<typeof ipcRenderer.on>) {
-    const [channel, listener] = args
-    return ipcRenderer.on(channel, (event, ...args) => listener(event, ...args))
-  },
-  off(...args: Parameters<typeof ipcRenderer.off>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.off(channel, ...omit)
-  },
-  send(...args: Parameters<typeof ipcRenderer.send>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.send(channel, ...omit)
-  },
-  invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.invoke(channel, ...omit)
-  },
+  // --------- Expose some API to the Renderer process ---------
+  contextBridge.exposeInMainWorld('ipcRenderer', {
+    on(...args: Parameters<typeof ipcRenderer.on>) {
+      const [channel, listener] = args
+      return ipcRenderer.on(channel, (event, ...args) => listener(event, ...args))
+    },
+    off(...args: Parameters<typeof ipcRenderer.off>) {
+      const [channel, ...omit] = args
+      return ipcRenderer.off(channel, ...omit)
+    },
+    send(...args: Parameters<typeof ipcRenderer.send>) {
+      const [channel, ...omit] = args
+      return ipcRenderer.send(channel, ...omit)
+    },
+    invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
+      const [channel, ...omit] = args
+      return ipcRenderer.invoke(channel, ...omit)
+    },
 
-  // You can expose other APTs you need here.
-  // ...
+    // You can expose other APTs you need here.
+    // ...
 
-}
-)
-contextBridge.exposeInMainWorld("system", {
-  getCpu: () => ipcRenderer.invoke("system:cpu"),
-  getMemory: () => ipcRenderer.invoke("system:memory"),
-  getGpu: () => ipcRenderer.invoke("system:gpu"),
-  getStorage: () => ipcRenderer.invoke("system:storage"),
-  getStorageDevices: () => ipcRenderer.invoke("system:storageDevices"),
-  getNetwork: () => ipcRenderer.invoke("system:network"),
-  getDisplayInfo: () => ipcRenderer.invoke("system:getDisplayInfo"),
-  getInputDevices: () =>ipcRenderer.invoke("system:getInputDevices"),
-  getDevices: () => ipcRenderer.invoke("system:getDevices"),
-  getProcesses: () => ipcRenderer.invoke("process:getAll"),
+  }
+  )
+  contextBridge.exposeInMainWorld("system", {
+    getCpu: () => ipcRenderer.invoke("system:cpu"),
+    getMemory: () => ipcRenderer.invoke("system:memory"),
+    getGpu: () => ipcRenderer.invoke("system:gpu"),
+    getStorage: () => ipcRenderer.invoke("system:storage"),
+    getStorageDevices: () => ipcRenderer.invoke("system:storageDevices"),
+    getNetwork: () => ipcRenderer.invoke("system:network"),
+    getDisplayInfo: () => ipcRenderer.invoke("system:getDisplayInfo"),
+
+    getDevices: () => ipcRenderer.invoke("system:getDevices"),
+    getProcesses: () => ipcRenderer.invoke("process:getAll"),
 
 
-  getFileIcon: (path: string) =>
-    ipcRenderer.invoke("system:getFileIcon", path),
-});
+    getFileIcon: (path: string) =>ipcRenderer.invoke("system:getFileIcon", path),
+    openFileLocation(path: string) { return ipcRenderer.invoke("system:openFileLocation",path);}
+
+    
+
+
+    
+  });

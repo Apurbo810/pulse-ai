@@ -14,6 +14,7 @@ pulse-ai
 │     │     ├─ devices.ts
 │     │     ├─ icon.ts
 │     │     ├─ process.ts
+│     │     ├─ shell.ts
 │     │     └─ system.ts
 │     ├─ electron-builder.json5
 │     ├─ index.html
@@ -28,12 +29,15 @@ pulse-ai
 │     │  ├─ app
 │     │  │  ├─ App.css
 │     │  │  └─ App.tsx
+|     |  |  └── router.tsx
 │     │  ├─ assets
 │     │  │  └─ logo
 │     │  ├─ components
 │     │  │  ├─ cards
 │     │  │  ├─ navigation
 │     │  │  │  └─ NavItem.tsx
+│     │  │  ├─ shared
+│     │  │  │  └─ ApplicationIcon.tsx
 │     │  │  └─ ui
 │     │  │     ├─ button.tsx
 │     │  │     ├─ card.tsx
@@ -76,11 +80,14 @@ pulse-ai
 │     │  │  │  │  ├─ ProcessRow.tsx
 │     │  │  │  │  ├─ ProcessTable.tsx
 │     │  │  │  │  ├─ ProcessToolbar.tsx
+│     │  │  │  │  ├─ RefreshIntervalSelect.tsx
 │     │  │  │  │  └─ SortableHeader.tsx
 │     │  │  │  ├─ hooks
 │     │  │  │  │  └─ useProcesses.ts
 │     │  │  │  ├─ ProcessesPage.tsx
-│     │  │  │  └─ types.ts
+│     │  │  │  ├─ types.ts
+│     │  │  │  └─ utils
+│     │  │  │     └─ preferences.ts
 │     │  │  ├─ settings
 │     │  │  ├─ shared
 │     │  │  │  └─ utils

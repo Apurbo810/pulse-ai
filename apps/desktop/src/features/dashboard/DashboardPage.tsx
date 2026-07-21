@@ -11,6 +11,7 @@ export default function DashboardPage() {
   const [memory, setMemory] = useState<MemoryInfo>({total: 0, used: 0,free: 0 });
   const [gpu, setGpu] = useState<GpuInfo>({ model: "", vendor: "", vram: 0, utilization: 0, });
   const [storage, setStorage] = useState<StorageSummary>({size: 0, used: 0, available: 0, use: 0 });
+  
   const [network, setNetwork] = useState<NetworkInfo>({
     name: "",
     connected: false,
@@ -19,6 +20,7 @@ export default function DashboardPage() {
     download: 0,
     upload: 0,
   });
+
 useEffect(() => {
   let cancelled = false;
 

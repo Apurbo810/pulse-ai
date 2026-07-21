@@ -9,6 +9,8 @@ export default function ProcessesPage() {
     filteredProcesses,
     loading,
     refresh,
+    refreshInterval,
+    setRefreshInterval,
     search,
     setSearch,
 
@@ -18,6 +20,10 @@ export default function ProcessesPage() {
 
     filter,
     setFilter,
+
+
+
+    
   } = useProcesses();
 
   return (
@@ -27,6 +33,10 @@ export default function ProcessesPage() {
         processCount={processes.length}
         search={search}
         onSearchChange={setSearch}
+
+        refreshInterval={refreshInterval}
+        onRefreshIntervalChange={setRefreshInterval}
+
         onRefresh={refresh}
       />
       

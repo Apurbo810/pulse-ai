@@ -7,7 +7,7 @@ import {
 
 import type { ProcessInfo } from "../../../types/system";
 import type { ProcessFilter, SortDirection, SortField } from "../types";
-
+import { loadPreferences, savePreferences, } from "../utils/preferences";
 export function useProcesses() {
   const [processes, setProcesses] = useState<ProcessInfo[]>([]);
   const [loading, setLoading] =useState(true);
@@ -15,14 +15,24 @@ export function useProcesses() {
 
   const [search, setSearch] = useState("");
 
-  const [sortField, setSortField] =
-    useState<SortField>("cpu");
+  const preferences = useMemo(() => loadPreferences(), []);
+
+  const [refreshInterval, setRefreshInterval] = useState(
+    preferences?.refreshInterval ?? 3000
+  );
+
+  const [filter, setFilter] = useState<ProcessFilter>(
+    preferences?.filter ?? "all"
+  );
+
+  const [sortField, setSortField] = useState<SortField>(
+    preferences?.sortField ?? "cpu"
+  );
 
   const [sortDirection, setSortDirection] =
-    useState<SortDirection>("desc");
-
-  const [filter, setFilter] =
-    useState<ProcessFilter>("all");
+    useState<SortDirection>(
+      preferences?.sortDirection ?? "desc"
+    );
 
   const refresh = useCallback(async () => {
     try {
@@ -49,14 +59,30 @@ export function useProcesses() {
       setSortDirection("desc");
     }
   };
-
+  useEffect(() => {
+    savePreferences({
+      refreshInterval,
+      filter,
+      sortField,
+      sortDirection,
+    });
+  }, [
+    refreshInterval,
+    filter,
+    sortField,
+    sortDirection,
+  ]);
   useEffect(() => {
     refresh();
 
-    const interval = setInterval(refresh, 3000);
+    if (refreshInterval === 0) {
+      return;
+    }
+
+    const interval = setInterval(refresh, refreshInterval);
 
     return () => clearInterval(interval);
-  }, [refresh]);
+  }, [refresh, refreshInterval]);
 
 const searchedProcesses = useMemo(() => {
   const query = search.trim().toLowerCase();
@@ -158,5 +184,8 @@ const filteredProcesses = useMemo(() => {
 
     filter,
     setFilter,
+
+    refreshInterval,
+    setRefreshInterval,
   };
 }

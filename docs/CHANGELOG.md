@@ -315,3 +315,59 @@ All notable changes to Pulse AI will be documented in this file.
 - Updated `ROADMAP.md`.
 - Updated `ARCHITECTURE.md`.
 - Documented the Process Manager architecture.  
+
+
+
+## [0.8.0-dev] - 2026-07-21
+
+### Added
+
+#### Process Manager
+
+- Added process sorting by:
+  - Name
+  - CPU usage
+  - GPU usage
+  - Memory usage
+  - Disk I/O
+  - Process ID (PID)
+- Added process filtering:
+  - Desktop Applications
+  - Background Processes
+  - Windows Processes
+  - Services
+- Added configurable auto-refresh intervals.
+- Added persistent Process Manager preferences.
+- Added application icon support for running processes.
+- Added **Open File Location** action for executable files.
+
+#### Electron
+
+- Added dedicated application icon service (`icon.ts`).
+- Added dedicated shell integration service (`shell.ts`).
+- Added IPC handlers for application icon retrieval.
+- Added IPC handlers for opening executable locations in Windows Explorer.
+
+### Changed
+
+#### Process Manager
+
+- Refactored the Process Manager into reusable components.
+- Improved filtering, sorting, and refresh workflow.
+- Enhanced the process details panel.
+
+#### Architecture
+
+- Expanded the Electron service layer with icon and shell services.
+- Continued modularizing the Process Manager feature.
+
+### Improved
+
+- Improved Process Manager usability with application icons.
+- Improved navigation to executable locations.
+- Improved maintainability through reusable toolbar, filter, and sorting components.
+
+### Documentation
+
+- Updated `ROADMAP.md`.
+- Updated `ARCHITECTURE.md`.

@@ -52,7 +52,10 @@ Build a solid desktop application foundation.
 
 ---
 
+### ✅ removed
+- [ ] Copy Executable Path
 
+---
 
 
 # Phase 3 — Process Manager
@@ -62,8 +65,7 @@ Build a solid desktop application foundation.
 > Build a modern and safe Windows Process Manager with real-time monitoring, process management, and AI-powered diagnostics.
 
 ---
-
-## 🚧 Phase 3.1 — Core Process Manager
+### ✅ Completed Features
 
 - [x] Display running processes
 - [x] Live CPU usage per process
@@ -76,25 +78,31 @@ Build a solid desktop application foundation.
 - [x] Refresh process list
 - [x] Expand/collapse process rows
 - [x] Search processes
----
-
-## 🚧 Phase 3.2 — Process Management
-
-
 - [x] Sort by Name
 - [x] Sort by CPU
 - [x] Sort by GPU
 - [x] Sort by Memory
 - [x] Sort by Disk
 - [x] Sort by PID
-
 - [x] Filter Desktop Applications
 - [x] Filter Background Processes
 - [x] Filter Windows Processes
 - [x] Filter Services
+- [x] Auto Refresh Interval
+- [x] Remember Process Manager preferences
+- [x] Open File Location
+- [x] Detect application icons
 
-- [ ] Auto Refresh Interval
-- [ ] Remember user preferences
+---
+## 🚧 Phase 3.1 — Core Process Manager
+
+Completed.
+
+---
+
+## 🚧 Phase 3.2 — Process Management
+
+Completed.
 
 ---
 
@@ -103,8 +111,6 @@ Build a solid desktop application foundation.
 - [ ] End Task
 - [ ] Prevent termination of critical Windows processes
 - [ ] Confirmation dialog before ending a process
-- [ ] Open File Location
-- [ ] Copy Executable Path
 - [ ] Open Process Properties
 
 ---
@@ -117,7 +123,7 @@ Build a solid desktop application foundation.
 - [ ] Display process start time
 - [ ] Display command line arguments
 - [ ] Detect application publisher
-- [ ] Detect application icons
+
 
 ---
 

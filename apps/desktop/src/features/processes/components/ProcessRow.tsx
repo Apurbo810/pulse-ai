@@ -37,7 +37,7 @@ export default function ProcessRow({
           ${selected ? "bg-muted" : ""}
         `}
       >
-        <TableCell className="py-3">
+        <TableCell className="py-2">
           <div className="flex items-center gap-3">
             {selected ? (
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -55,11 +55,7 @@ export default function ProcessRow({
                 {process.name}
               </p>
 
-              {process.executablePath && (
-                <p className="truncate text-xs text-muted-foreground">
-                  {process.executablePath}
-                </p>
-              )}
+
             </div>
           </div>
         </TableCell>

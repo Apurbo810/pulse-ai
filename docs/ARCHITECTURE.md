@@ -90,7 +90,7 @@ Counters              APIs
         - Display Detection
         - Keyboard Detection
         - Mouse Detection
-        - Performance History Graphs
+        - Performance History Charts
 
         The shared monitoring service (`monitor.ts`) centralizes system data collection.
 
@@ -167,10 +167,11 @@ Counters              APIs
         │     │  ├─ electron-env.d.ts
         │     │  ├─ main.ts
         │     │  ├─ preload.ts
-        │     │  ├─ process.ts
         │     │  └─ services
         │     │     ├─ devices.ts
+        │     │     ├─ icon.ts
         │     │     ├─ process.ts
+        │     │     ├─ shell.ts
         │     │     └─ system.ts
         │     ├─ electron-builder.json5
         │     ├─ index.html
@@ -192,6 +193,8 @@ Counters              APIs
         │     │  │  ├─ cards
         │     │  │  ├─ navigation
         │     │  │  │  └─ NavItem.tsx
+        │     │  │  ├─ shared
+        │     │  │  │  └─ ApplicationIcon.tsx
         │     │  │  └─ ui
         │     │  │     ├─ button.tsx
         │     │  │     ├─ card.tsx
@@ -229,12 +232,19 @@ Counters              APIs
         │     │  │  ├─ processes
         │     │  │  │  ├─ components
         │     │  │  │  │  ├─ ProcessDetails.tsx
+        │     │  │  │  │  ├─ ProcessFilterBar.tsx
+        │     │  │  │  │  ├─ ProcessIcon.tsx
         │     │  │  │  │  ├─ ProcessRow.tsx
         │     │  │  │  │  ├─ ProcessTable.tsx
-        │     │  │  │  │  └─ ProcessToolbar.tsx
+        │     │  │  │  │  ├─ ProcessToolbar.tsx
+        │     │  │  │  │  ├─ RefreshIntervalSelect.tsx
+        │     │  │  │  │  └─ SortableHeader.tsx
         │     │  │  │  ├─ hooks
         │     │  │  │  │  └─ useProcesses.ts
-        │     │  │  │  └─ ProcessesPage.tsx
+        │     │  │  │  ├─ ProcessesPage.tsx
+        │     │  │  │  ├─ types.ts
+        │     │  │  │  └─ utils
+        │     │  │  │     └─ preferences.ts
         │     │  │  ├─ settings
         │     │  │  ├─ shared
         │     │  │  │  └─ utils
@@ -269,8 +279,7 @@ Counters              APIs
         │     │  └─ vite-env.d.ts
         │     ├─ tsconfig.json
         │     ├─ tsconfig.node.json
-        │     ├─ vite.config.ts
-        │     └─ vite.config.ts.timestamp-1784449007718-571f3bd1253da.mjs
+        │     └─vite.config.ts
         ├─ docs
         │  ├─ ARCHITECTURE.md
         │  ├─ CHANGELOG.md
@@ -297,6 +306,10 @@ Counters              APIs
         - Monitoring
         - Storage
         - Process Manager
+
+        The Process Manager provides real-time process monitoring, filtering,
+        sorting, live resource usage, application icons, and executable
+        inspection through Windows Explorer.
 
         Upcoming modules include:
 

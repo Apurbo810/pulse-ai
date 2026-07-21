@@ -7,7 +7,7 @@ import { getCpuInfo, getMemoryInfo,getGpuInfo, getStorageInfo,getNetworkInfo,get
 import { getDevices } from "./services/devices";
 import { getProcesses } from "./services/process";
 import { getFileIcon } from "./services/icon";
-
+import {openFileLocation } from "./services/shell"
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -114,6 +114,12 @@ app.whenReady().then(() => {
     return getProcesses();
   });
 
+  ipcMain.handle(
+    "system:openFileLocation",
+    (_, executablePath: string) =>
+      openFileLocation(executablePath)
+  );
 
+  
   createWindow();
 });
