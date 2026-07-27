@@ -1,3 +1,6 @@
+//features/processes/components/ProcessActions.tsx
+
+
 import {
   Ban,
   FolderOpen,
@@ -6,13 +9,27 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-interface ProcessDetailsProps {
+interface ProcessActionsProps {
+  pid: number;
   executablePath: string | null;
+  isCritical: boolean;
+
+  onEndProcess: (pid: number) => Promise<void>;
 }
 
-export default function ProcessDetails({
+export default function ProcessActions({
+  pid,
   executablePath,
-}: ProcessDetailsProps) {
+  isCritical,
+  onEndProcess,
+}: ProcessActionsProps) {
+  async function handleEndTask() {
+  try {
+    await onEndProcess(pid);
+  } catch (error) {
+    console.error("Failed to end process:", error);
+  }
+}
   return (
     <div className="rounded-lg border bg-background p-5">
       <div className="mb-5">
@@ -49,9 +66,11 @@ export default function ProcessDetails({
         <Button
           variant="destructive"
           className="ml-auto"
+          disabled={isCritical}
+          onClick={handleEndTask}
         >
           <Ban className="mr-2 h-4 w-4" />
-          End Task
+          {isCritical ? "Protected Process" : "End Task"}
         </Button>
       </div>
     </div>

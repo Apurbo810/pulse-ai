@@ -1,3 +1,5 @@
+//features/processes/hooks/useProcesses.ts
+
 import {
   useCallback,
   useEffect,
@@ -8,6 +10,9 @@ import {
 import type { ProcessInfo } from "../../../types/system";
 import type { ProcessFilter, SortDirection, SortField } from "../types";
 import { loadPreferences, savePreferences, } from "../utils/preferences";
+
+
+
 export function useProcesses() {
   const [processes, setProcesses] = useState<ProcessInfo[]>([]);
   const [loading, setLoading] =useState(true);
@@ -166,6 +171,11 @@ const filteredProcesses = useMemo(() => {
     return sorted;
   }, [filteredProcesses, sortField, sortDirection]);
 
+  const endProcess = useCallback(async (pid: number) => {
+    await window.system.endProcess(pid);
+    await refresh();
+  }, [refresh]);
+
   return {
     processes,
     filteredProcesses: sortedProcesses,
@@ -174,6 +184,7 @@ const filteredProcesses = useMemo(() => {
     error,
 
     refresh,
+    endProcess,
 
     search,
     setSearch,

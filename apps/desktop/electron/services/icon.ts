@@ -1,3 +1,6 @@
+//electron/services/icon.ts
+
+
 import { app } from "electron";
 
 const iconCache = new Map<string, string>();

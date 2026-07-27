@@ -1,3 +1,5 @@
+//features/processes/components/ProcessRow.tsx
+
 import { ChevronDown, ChevronRight } from "lucide-react";
 import ApplicationIcon from "@/components/shared/ApplicationIcon";
 import type { ProcessInfo } from "@/types/system";
@@ -7,12 +9,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import ProcessDetails from "./ProcessDetails";
+import ProcessActions from "./ProcessActions";
 
 interface ProcessRowProps {
   process: ProcessInfo;
   selected: boolean;
   onSelect: () => void;
+
+  onEndProcess: (pid: number) => Promise<void>;
+
+  onOpenContextMenu: (
+    x: number,
+    y: number,
+    process: ProcessInfo
+  ) => void;
 }
 
 function formatDiskActivity(bytesPerSecond: number) {
@@ -25,11 +35,23 @@ export default function ProcessRow({
   process,
   selected,
   onSelect,
+  onEndProcess,
+  onOpenContextMenu,
 }: ProcessRowProps) {
   return (
     <>
+
       <TableRow
         onClick={onSelect}
+            onContextMenu={(e) => {
+      e.preventDefault();
+
+      onOpenContextMenu(
+        e.clientX,
+        e.clientY,
+        process
+      );
+    }}
         className={`
           cursor-pointer
           transition-colors
@@ -37,6 +59,7 @@ export default function ProcessRow({
           ${selected ? "bg-muted" : ""}
         `}
       >
+        
         <TableCell className="py-2">
           <div className="flex items-center gap-3">
             {selected ? (
@@ -109,12 +132,17 @@ export default function ProcessRow({
       {selected && (
         <TableRow>
           <TableCell colSpan={6} className="bg-muted/20 p-4">
-            <ProcessDetails
-              executablePath={process.executablePath ?? null}
+            <ProcessActions
+            pid={process.pid}
+            executablePath={process.executablePath}
+            isCritical={process.isCritical}
+            onEndProcess={onEndProcess}
             />
           </TableCell>
         </TableRow>
+        
       )}
+
     </>
   );
 }

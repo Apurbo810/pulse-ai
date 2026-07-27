@@ -84,4 +84,6 @@ export interface ProcessInfo {
   gpu?: number;
   disk?: number;
   status?: "Running" | "Suspended" | "Not Responding";
+
+  isCritical: boolean;
 }

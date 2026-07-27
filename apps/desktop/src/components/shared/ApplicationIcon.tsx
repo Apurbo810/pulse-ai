@@ -61,7 +61,7 @@ export default function ApplicationIcon({
     return (
       <img
         src={icon}
-        alt=""
+        alt={`${executablePath ?? "Application"} icon`}
         width={size}
         height={size}
         draggable={false}

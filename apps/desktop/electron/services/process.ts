@@ -1,7 +1,10 @@
+//electron/services/process.ts
+
 import si from "systeminformation";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { ProcessInfo } from "../../src/types/system";
+import { isCriticalProcess } from "./processes/criticalProcesses";
 
 const execFileAsync = promisify(execFile);
 
@@ -113,5 +116,35 @@ export async function getProcesses(): Promise<ProcessInfo[]> {
     executablePath: process.path,
 
     status: process.state.includes("suspended") ? "Suspended" : "Running",
-    }));
+
+    isCritical: isCriticalProcess(process.name),
+    }));    
+}
+export async function endProcess(pid: number): Promise<void> {
+  try {
+    // Find the process first
+    const processes = await si.processes();
+
+    const process = processes.list.find((p) => p.pid === pid);
+
+    if (!process) {
+      throw new Error(`Process ${pid} not found.`);
+    }
+
+    // Prevent killing protected Windows processes
+    if (isCriticalProcess(process.name)) {
+      throw new Error(
+        `"${process.name}" is a protected Windows process and cannot be terminated.`
+      );
+    }
+
+    await execFileAsync("taskkill", [
+      "/PID",
+      String(pid),
+      "/F",
+    ]);
+  } catch (error) {
+    console.error(`Failed to terminate process ${pid}:`, error);
+    throw error;
+  }
 }

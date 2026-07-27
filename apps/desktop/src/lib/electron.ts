@@ -40,6 +40,11 @@ import type {
         getFileIcon(path: string): Promise<string | null>;
 
         openFileLocation(path: string): Promise<void>;
+
+        endProcess(pid: number): Promise<void>;
+
+
+        
       };
     }
   }

@@ -13,14 +13,14 @@ export default function ProcessesPage() {
     setRefreshInterval,
     search,
     setSearch,
-
+    endProcess,
+    
     sortField,
     sortDirection,
     toggleSort,
 
     filter,
     setFilter,
-
 
 
     
@@ -51,6 +51,7 @@ export default function ProcessesPage() {
         sortField={sortField}
         sortDirection={sortDirection}
         onSort={toggleSort}
+        onEndProcess={endProcess}
       />
 
       

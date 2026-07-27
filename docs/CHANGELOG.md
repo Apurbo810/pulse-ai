@@ -371,3 +371,45 @@ All notable changes to Pulse AI will be documented in this file.
 
 - Updated `ROADMAP.md`.
 - Updated `ARCHITECTURE.md`.
+
+## [0.9.0-dev] - 2026-07-22
+
+### Added
+
+#### Process Manager
+
+- Added custom Windows-style right-click context menu.
+- Added **End Task** action.
+- Added **Search Process Online** action.
+- Added dedicated Process Properties panel.
+- Displayed Process ID (PID) in the properties panel.
+- Displayed executable path in the properties panel.
+- Added backend protection for critical Windows processes.
+- Added frontend detection of protected processes.
+- Disabled process termination for protected Windows processes.
+
+#### Electron
+
+- Added Windows critical process detection service (`criticalProcesses.ts`).
+- Added backend validation to prevent termination of protected system processes.
+
+### Changed
+
+#### Process Manager
+
+- Improved the Process Properties experience with dedicated process actions.
+- Refactored process actions into reusable UI components.
+- Updated the context menu to support process-specific actions.
+- Improved Process Manager safety by preventing accidental termination of critical Windows processes.
+
+### Improved
+
+- Added an additional safety layer by validating protected processes in both the frontend and backend.
+- Improved reliability of process termination.
+- Improved modularity by separating process protection logic into a dedicated service.
+
+### Documentation
+
+- Updated `ROADMAP.md`.
+- Updated `ARCHITECTURE.md`.
+- Documented the Process Actions architecture.

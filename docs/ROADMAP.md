@@ -52,7 +52,7 @@ Build a solid desktop application foundation.
 
 ---
 
-### ✅ removed
+### Removed
 - [ ] Copy Executable Path
 
 ---
@@ -67,7 +67,7 @@ Build a solid desktop application foundation.
 ---
 ### ✅ Completed Features
 
-- [x] Display running processes
+- [x] Display Running Processes
 - [x] Live CPU usage per process
 - [x] Live Memory usage per process
 - [x] Live GPU usage per process
@@ -94,7 +94,7 @@ Build a solid desktop application foundation.
 - [x] Detect application icons
 
 ---
-## 🚧 Phase 3.1 — Core Process Manager
+## ✅ Phase 3.1 — Core Process Manager
 
 Completed.
 
@@ -106,23 +106,30 @@ Completed.
 
 ---
 
-## 🚧 Phase 3.3 — Process Actions
+## ✅ Phase 3.3 — Process Actions
 
-- [ ] End Task
-- [ ] Prevent termination of critical Windows processes
-- [ ] Confirmation dialog before ending a process
-- [ ] Open Process Properties
+- [x] End Task
+- [x] Prevent termination of critical Windows processes
+- [ ] Confirmation dialog before ending a process (optional)
+- [x] Open File Location
+- [x] Search Process Online
+- [x] Right-click context menu
+
+
+Completed but only optional left.
 
 ---
 
 ## 🚧 Phase 3.4 — Process Intelligence
 
-- [ ] Display process PID
-- [ ] Display process owner
+- [X] Expandable process information panel
+- [X] Display Process ID (PID)
 - [ ] Display process priority
 - [ ] Display process start time
 - [ ] Display command line arguments
+- [ ] Display process owner
 - [ ] Detect application publisher
+- [X] Display executable path
 
 
 ---

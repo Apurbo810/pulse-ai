@@ -1,3 +1,5 @@
+//electron/services/devices.ts
+
 import { exec } from "child_process";
 import { promisify } from "util";
 

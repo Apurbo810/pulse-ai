@@ -14,6 +14,8 @@ pulse-ai
 │     │     ├─ devices.ts
 │     │     ├─ icon.ts
 │     │     ├─ process.ts
+│     │     ├─ processes
+│     │     │  └─ criticalProcesses.ts
 │     │     ├─ shell.ts
 │     │     └─ system.ts
 │     ├─ electron-builder.json5
@@ -29,7 +31,6 @@ pulse-ai
 │     │  ├─ app
 │     │  │  ├─ App.css
 │     │  │  └─ App.tsx
-|     |  |  └── router.tsx
 │     │  ├─ assets
 │     │  │  └─ logo
 │     │  ├─ components
@@ -39,9 +40,12 @@ pulse-ai
 │     │  │  ├─ shared
 │     │  │  │  └─ ApplicationIcon.tsx
 │     │  │  └─ ui
+│     │  │     ├─ badge.tsx
 │     │  │     ├─ button.tsx
 │     │  │     ├─ card.tsx
 │     │  │     ├─ chart.tsx
+│     │  │     ├─ context-menu.tsx
+│     │  │     ├─ dialog.tsx
 │     │  │     ├─ input.tsx
 │     │  │     ├─ progress.tsx
 │     │  │     └─ table.tsx
@@ -74,9 +78,13 @@ pulse-ai
 │     │  │  ├─ optimizer
 │     │  │  ├─ processes
 │     │  │  │  ├─ components
-│     │  │  │  │  ├─ ProcessDetails.tsx
+│     │  │  │  │  ├─ ProcessActions.tsx
+│     │  │  │  │  ├─ ProcessContextMenu.tsx
 │     │  │  │  │  ├─ ProcessFilterBar.tsx
-│     │  │  │  │  ├─ ProcessIcon.tsx
+│     │  │  │  │  ├─ ProcessMetrics.tsx
+│     │  │  │  │  ├─ ProcessOverview.tsx
+│     │  │  │  │  ├─ ProcessPath.tsx
+│     │  │  │  │  ├─ ProcessPropertiesDialog.tsx
 │     │  │  │  │  ├─ ProcessRow.tsx
 │     │  │  │  │  ├─ ProcessTable.tsx
 │     │  │  │  │  ├─ ProcessToolbar.tsx

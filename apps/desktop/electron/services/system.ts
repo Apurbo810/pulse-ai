@@ -1,3 +1,5 @@
+//electron/services/system.ts
+
 import si from "systeminformation";
 import { StorageDevice } from "../../src/types/system";
 
