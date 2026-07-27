@@ -1,3 +1,5 @@
+// src/lib/monitor.ts
+
 import type {
   CpuInfo,
   MemoryInfo,
@@ -42,15 +44,7 @@ const snapshot = {
 console.log(snapshot);
 
 return snapshot;
-  return {
-    cpu,
-    memory,
-    gpu,
-    storage,
-    network,
-    displays,
-    devices
-  };
+
 }
 
 // ----------------------
@@ -91,4 +85,41 @@ export function startMonitoring(interval = 2000) {
   }
 
   poll();
+}
+
+
+
+export async function getLiveSnapshot() {
+  const [cpu, memory, gpu, network] =
+    await Promise.all([
+      window.system.getCpu(),
+      window.system.getMemory(),
+      window.system.getGpu(),
+      window.system.getNetwork(),
+    ]);
+
+  return {
+    cpu,
+    memory,
+    gpu,
+    network,
+  };
+}
+
+
+export async function getStorageSnapshot() {
+  return window.system.getStorage();
+}
+
+export async function getHardwareSnapshot() {
+  const [displays, devices] =
+    await Promise.all([
+      window.system.getDisplayInfo(),
+      window.system.getDevices(),
+    ]);
+
+  return {
+    displays,
+    devices,
+  };
 }

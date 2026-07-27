@@ -1,4 +1,4 @@
-// features/processes/components/ProcessContextMenu.tsx
+// features/processes/components/menus/ProcessContextMenu.tsx
 
 import { useEffect } from "react";
 import {

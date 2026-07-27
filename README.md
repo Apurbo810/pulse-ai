@@ -27,6 +27,9 @@ pulse-ai
 │     │  ├─ electron-vite.svg
 │     │  └─ vite.svg
 │     ├─ README.md
+│     ├─ release
+│     │  └─ 0.0.0
+│     │     └─ win-unpacked
 │     ├─ src
 │     │  ├─ app
 │     │  │  ├─ App.css
@@ -77,19 +80,35 @@ pulse-ai
 │     │  │  │     └─ MonitoringPage.tsx
 │     │  │  ├─ optimizer
 │     │  │  ├─ processes
+│     │  │  │  ├─ analysis
+│     │  │  │  │  ├─ cpuAnalyzer.ts
+│     │  │  │  │  ├─ diskAnalyzer.ts
+│     │  │  │  │  ├─ gpuAnalyzer.ts
+│     │  │  │  │  ├─ index.ts
+│     │  │  │  │  ├─ memoryAnalyzer.ts
+│     │  │  │  │  ├─ test.ts
+│     │  │  │  │  └─ types.ts
 │     │  │  │  ├─ components
-│     │  │  │  │  ├─ ProcessActions.tsx
-│     │  │  │  │  ├─ ProcessContextMenu.tsx
-│     │  │  │  │  ├─ ProcessFilterBar.tsx
-│     │  │  │  │  ├─ ProcessMetrics.tsx
-│     │  │  │  │  ├─ ProcessOverview.tsx
-│     │  │  │  │  ├─ ProcessPath.tsx
-│     │  │  │  │  ├─ ProcessPropertiesDialog.tsx
-│     │  │  │  │  ├─ ProcessRow.tsx
-│     │  │  │  │  ├─ ProcessTable.tsx
-│     │  │  │  │  ├─ ProcessToolbar.tsx
-│     │  │  │  │  ├─ RefreshIntervalSelect.tsx
-│     │  │  │  │  └─ SortableHeader.tsx
+│     │  │  │  │  ├─ actions
+│     │  │  │  │  │  └─ ProcessActions.tsx
+│     │  │  │  │  ├─ dialogs
+│     │  │  │  │  │  ├─ ProcessPropertiesDialog.tsx
+│     │  │  │  │  │  └─ sections
+│     │  │  │  │  │     ├─ ExecutableSection.tsx
+│     │  │  │  │  │     ├─ OverviewSection.tsx
+│     │  │  │  │  │     ├─ PerformanceSection.tsx
+│     │  │  │  │  │     ├─ ProcessAdvancedSection.tsx
+│     │  │  │  │  │     └─ ProcessDetailsSection.tsx
+│     │  │  │  │  ├─ menus
+│     │  │  │  │  │  └─ ProcessContextMenu.tsx
+│     │  │  │  │  ├─ table
+│     │  │  │  │  │  ├─ ProcessRow.tsx
+│     │  │  │  │  │  ├─ ProcessTable.tsx
+│     │  │  │  │  │  └─ SortableHeader.tsx
+│     │  │  │  │  └─ toolbar
+│     │  │  │  │     ├─ ProcessFilterBar.tsx
+│     │  │  │  │     ├─ ProcessToolbar.tsx
+│     │  │  │  │     └─ RefreshIntervalSelect.tsx
 │     │  │  │  ├─ hooks
 │     │  │  │  │  └─ useProcesses.ts
 │     │  │  │  ├─ ProcessesPage.tsx
@@ -128,6 +147,7 @@ pulse-ai
 │     │  │  └─ system.ts
 │     │  ├─ utils
 │     │  └─ vite-env.d.ts
+│     ├─ test-cpu.js
 │     ├─ tsconfig.json
 │     ├─ tsconfig.node.json
 │     ├─ vite.config.ts

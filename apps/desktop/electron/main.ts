@@ -1,14 +1,12 @@
   import { app, BrowserWindow } from 'electron'
-  import { createRequire } from 'node:module'
   import { fileURLToPath } from 'node:url'
   import path from 'node:path'
   import { ipcMain } from "electron";
-  import { getCpuInfo, getMemoryInfo,getGpuInfo, getStorageInfo,getNetworkInfo,getStorageDevices,getDisplayInfo } from "./services/system";
+  import { getCpuInfo, getMemoryInfo,getGpuInfo, getStorageInfo,getNetworkInfo,getStorageDevices,getDisplayInfo, startCpuMonitoring, stopCpuMonitoring } from "./services/system";
   import { getDevices } from "./services/devices";
   import { getProcesses, endProcess  } from "./services/process";
   import { getFileIcon } from "./services/icon";
   import {openFileLocation } from "./services/shell"
-  const require = createRequire(import.meta.url)
   const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
   // The built directory structure
@@ -57,6 +55,7 @@
   // explicitly with Cmd + Q.
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
+      stopCpuMonitoring()
       app.quit()
       win = null
     }
@@ -71,8 +70,12 @@
   })
 
   app.whenReady().then(() => {
+    void startCpuMonitoring().catch((error) => {
+      console.error("Failed to start CPU monitoring:", error);
+    });
+
     ipcMain.handle("system:cpu", async () => {
-      return await getCpuInfo();
+      return getCpuInfo();
     });
 
     ipcMain.handle("system:memory", async () => {

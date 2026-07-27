@@ -1,4 +1,6 @@
-import type { SortDirection, SortField } from "../types";
+// features/processes/components/table/SortableHeader.tsx
+
+import type { SortDirection, SortField } from "../../types";
 
 interface SortableHeaderProps {
   label: string;

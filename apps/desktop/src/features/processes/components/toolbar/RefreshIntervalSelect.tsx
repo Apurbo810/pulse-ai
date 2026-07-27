@@ -1,3 +1,5 @@
+// features/processes/components/toolbar/RefreshIntervalSelect.tsx
+
 interface RefreshIntervalSelectProps {
   value: number;
   onChange: (value: number) => void;

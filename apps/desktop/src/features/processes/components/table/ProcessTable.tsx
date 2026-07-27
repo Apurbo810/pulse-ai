@@ -1,14 +1,14 @@
-// features/processes/components/ProcessTable.tsx
+// features/processes/components/table/ProcessTable.tsx
 
 import { useState } from "react";
 
 import type { ProcessInfo } from "@/types/system";
-import type { SortDirection, SortField } from "../types";
+import type { SortDirection, SortField } from "../../types";
 
 import ProcessRow from "./ProcessRow";
-import ProcessContextMenu from "./ProcessContextMenu";
+import ProcessContextMenu from "../menus/ProcessContextMenu";
 import SortableHeader from "./SortableHeader";
-import ProcessPropertiesDialog from "./ProcessPropertiesDialog";
+import ProcessPropertiesDialog from "../dialogs/ProcessPropertiesDialog";
 
 import {
   Table,

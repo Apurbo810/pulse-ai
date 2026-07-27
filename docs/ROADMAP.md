@@ -100,7 +100,7 @@ Completed.
 
 ---
 
-## 🚧 Phase 3.2 — Process Management
+## ✅ Phase 3.2 — Process Management
 
 Completed.
 
@@ -124,11 +124,11 @@ Completed but only optional left.
 
 - [X] Expandable process information panel
 - [X] Display Process ID (PID)
-- [ ] Display process priority
-- [ ] Display process start time
-- [ ] Display command line arguments
-- [ ] Display process owner
-- [ ] Detect application publisher
+- [x] Display process priority
+- [x] Display process start time
+- [x] Display command line arguments
+- [x] Display process owner
+- [ ] Detect application publisher (Deferred)
 - [X] Display executable path
 
 
@@ -136,7 +136,7 @@ Completed but only optional left.
 
 ## 🚧 Phase 3.5 — Pulse AI Analysis
 
-- [ ] Analyze high CPU usage
+- [x] Analyze high CPU usage
 - [ ] Analyze high Memory usage
 - [ ] Analyze GPU bottlenecks
 - [ ] Analyze Disk bottlenecks

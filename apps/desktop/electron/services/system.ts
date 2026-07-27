@@ -1,7 +1,26 @@
 //electron/services/system.ts
 
 import si from "systeminformation";
-import { StorageDevice } from "../../src/types/system";
+import { CpuInfo, StorageDevice } from "../../src/types/system";
+
+const CPU_SAMPLE_INTERVAL_MS = 2_000;
+const GPU_CACHE_TTL_MS = 10_000;
+
+let cpuMonitoringStarted = false;
+let cpuSampling = false;
+let cpuTimer: ReturnType<typeof setInterval> | undefined;
+let latestCpu: CpuInfo = {
+  usage: 0,
+  user: 0,
+  system: 0,
+  idle: 100,
+};
+
+type GraphicsInfo = Awaited<ReturnType<typeof si.graphics>>;
+
+let cachedGraphics: GraphicsInfo | null = null;
+let graphicsFetchedAt = 0;
+let graphicsInFlight: Promise<GraphicsInfo> | null = null;
 
 
 export interface InputDevice {
@@ -10,15 +29,71 @@ export interface InputDevice {
   product: string;
 }
 
-export async function getCpuInfo() {
-  const load = await si.currentLoad();
 
-  return {
+
+async function sampleCpu(): Promise<void> {
+  if (cpuSampling) return;
+
+  cpuSampling = true;
+  try {
+    const load = await si.currentLoad();
+    latestCpu = {
     usage: Math.round(load.currentLoad),
     user: Math.round(load.currentLoadUser),
     system: Math.round(load.currentLoadSystem),
     idle: Math.round(load.currentLoadIdle),
-  };
+    };
+  } finally {
+    cpuSampling = false;
+  }
+}
+
+/**
+ * Own the systeminformation CPU baseline in one place. currentLoad() keeps
+ * module-level state, so calling it from IPC handlers can shorten or overlap
+ * its sample window when multiple renderer consumers request CPU data.
+ */
+export async function startCpuMonitoring(): Promise<void> {
+  if (cpuMonitoringStarted) return;
+
+  cpuMonitoringStarted = true;
+  await si.currentLoad();
+  await new Promise<void>((resolve) => setTimeout(resolve, 1_000));
+  await sampleCpu();
+
+  cpuTimer = setInterval(() => {
+    void sampleCpu();
+  }, CPU_SAMPLE_INTERVAL_MS);
+}
+
+export function stopCpuMonitoring(): void {
+  if (cpuTimer) clearInterval(cpuTimer);
+  cpuTimer = undefined;
+  cpuMonitoringStarted = false;
+}
+
+/** Returns the latest centrally sampled CPU value without advancing the baseline. */
+export function getCpuInfo(): CpuInfo {
+  return latestCpu;
+}
+
+async function getCachedGraphics(): Promise<GraphicsInfo> {
+  const now = Date.now();
+  if (cachedGraphics && now - graphicsFetchedAt < GPU_CACHE_TTL_MS) {
+    return cachedGraphics;
+  }
+
+  if (!graphicsInFlight) {
+    graphicsInFlight = si.graphics().then((graphics) => {
+      cachedGraphics = graphics;
+      graphicsFetchedAt = Date.now();
+      return graphics;
+    }).finally(() => {
+      graphicsInFlight = null;
+    });
+  }
+
+  return graphicsInFlight;
 }
 
 export async function getMemoryInfo() {
@@ -32,7 +107,7 @@ export async function getMemoryInfo() {
 }
 
 export async function getGpuInfo() {
-  const graphics = await si.graphics();
+  const graphics = await getCachedGraphics();
 
   const controller = graphics.controllers[0];
 
@@ -142,7 +217,7 @@ export async function getStorageDevices(): Promise<StorageDevice[]> {
   }
 
   export async function getDisplayInfo() {
-    const graphics = await si.graphics();
+    const graphics = await getCachedGraphics();
 
     return graphics.displays.map((display) => ({
       model: display.model,

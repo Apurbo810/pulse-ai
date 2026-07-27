@@ -106,20 +106,35 @@ export async function getProcesses(): Promise<ProcessInfo[]> {
     getDiskUsageByProcess(),
   ]);
 
-  return processes.list.map((process) => ({
+
+
+    return processes.list.map((process) => ({
     pid: process.pid,
     name: process.name,
+
     cpu: Number.isFinite(process.cpu) ? process.cpu : 0,
     gpu: gpuUsageByProcess.get(process.pid) ?? 0,
     disk: diskUsageByProcess.get(process.pid) ?? 0,
     memory: Number((process.memRss / 1024).toFixed(2)),
+
     executablePath: process.path,
 
-    status: process.state.includes("suspended") ? "Suspended" : "Running",
+    startTime: process.started ?? null,
+    owner: process.user || null,
+    priority: process.priority,
+    commandLine: [process.command, process.params]
+      .filter(Boolean)
+      .join(" ")
+      .trim(),
+
+    status: process.state.includes("suspended")
+      ? "Suspended"
+      : "Running",
 
     isCritical: isCriticalProcess(process.name),
-    }));    
+  }));
 }
+
 export async function endProcess(pid: number): Promise<void> {
   try {
     // Find the process first

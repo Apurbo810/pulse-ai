@@ -1,5 +1,7 @@
+// features/processes/components/toolbar/ProcessFilterBar.tsx
+
 import { Button } from "@/components/ui/button";
-import type { ProcessFilter } from "../types";
+import type { ProcessFilter } from "../../types";
 
 interface ProcessFilterBarProps {
   filter: ProcessFilter;

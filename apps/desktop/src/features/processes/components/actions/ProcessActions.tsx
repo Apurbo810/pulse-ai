@@ -1,4 +1,4 @@
-//features/processes/components/ProcessActions.tsx
+//features/processes/components/actions/ProcessActions.tsx
 
 
 import {

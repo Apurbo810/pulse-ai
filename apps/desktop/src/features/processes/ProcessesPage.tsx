@@ -1,7 +1,7 @@
 import { useProcesses } from "./hooks/useProcesses";
-import ProcessToolbar from "./components/ProcessToolbar";
-import ProcessTable from "./components/ProcessTable";
-import ProcessFilterBar from "./components/ProcessFilterBar";
+import ProcessToolbar from "./components/toolbar/ProcessToolbar";
+import ProcessTable from "./components/table/ProcessTable";
+import ProcessFilterBar from "./components/toolbar/ProcessFilterBar";
 
 export default function ProcessesPage() {
   const {

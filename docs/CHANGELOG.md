@@ -413,3 +413,56 @@ All notable changes to Pulse AI will be documented in this file.
 - Updated `ROADMAP.md`.
 - Updated `ARCHITECTURE.md`.
 - Documented the Process Actions architecture.
+
+## [0.10.0-dev] - 2026-07-27
+
+
+# Changelog
+
+## [Unreleased]
+
+### Added
+- Added centralized CPU monitoring service in the Electron main process.
+- Added CPU monitoring lifecycle (`startCpuMonitoring` / `stopCpuMonitoring`).
+- Added cached CPU snapshot to prevent repeated `systeminformation.currentLoad()` calls.
+- Added GPU information caching with a configurable cache lifetime (10 seconds).
+- Added protection against overlapping CPU sampling.
+- Added CPU warm-up sequence for more accurate initial readings.
+- Added CPU process analysis engine with severity classification:
+  - Medium
+  - High
+  - Critical
+- Added application-specific CPU optimization recommendations for:
+  - Chrome
+  - Microsoft Edge
+  - Firefox
+  - Discord
+  - Visual Studio Code
+  - OBS Studio
+  - Steam
+
+### Changed
+- Refactored CPU monitoring to use a single sampling source instead of sampling from renderer requests.
+- Updated IPC `system:cpu` handler to return cached CPU values.
+- Refactored Dashboard monitoring into separate polling loops:
+  - Live system metrics every 2 seconds.
+  - Storage statistics every 15 seconds.
+- Reduced expensive hardware polling frequency.
+- Refactored GPU monitoring to reuse cached graphics information.
+- Updated display information retrieval to reuse the same cached graphics snapshot.
+- Improved monitoring architecture to reduce unnecessary PowerShell/WMI executions.
+- Improved CPU reading stability by preventing sampling interference from concurrent requests.
+- Simplified renderer-side monitoring logic.
+
+### Improved
+- Reduced CPU overhead caused by repeated `currentLoad()` sampling.
+- Reduced unnecessary GPU hardware discovery.
+- Reduced storage polling frequency.
+- Improved consistency between Pulse AI CPU readings and Windows Task Manager.
+- Improved overall responsiveness of the monitoring subsystem.
+- Improved maintainability by centralizing monitoring responsibilities.
+
+### Removed
+- Removed temporary CPU debugging logs.
+- Removed experimental CPU investigation code used during performance analysis.
+- Removed redundant renderer-driven CPU sampling.

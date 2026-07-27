@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import StatCard from "./components/StatCard";
 import type {CpuInfo, MemoryInfo, GpuInfo, StorageSummary, NetworkInfo } from "@/types/system";
-import { getSystemSnapshot } from "@/lib/monitor";
+import { getStorageSnapshot, getLiveSnapshot  } from "@/lib/monitor";
 export default function DashboardPage() {
 
 
@@ -24,34 +24,56 @@ export default function DashboardPage() {
 useEffect(() => {
   let cancelled = false;
 
-  async function loadLoop() {
+  async function pollLive() {
     if (cancelled) return;
 
-    const start = performance.now();
-
     try {
-      const snapshot = await getSystemSnapshot();
+      const live = await getLiveSnapshot();
 
       if (cancelled) return;
 
-    setCpu(snapshot.cpu);
-    setMemory(snapshot.memory);
-    setGpu(snapshot.gpu);
-    setStorage(snapshot.storage);
-    setNetwork(snapshot.network);
+      setCpu(live.cpu);
+      setMemory(live.memory);
+      setGpu(live.gpu);
+      setNetwork(live.network);
     } catch (err) {
       console.error(err);
     }
 
-    const elapsed = performance.now() - start;
-    console.log(`System Info: ${elapsed.toFixed(0)} ms`);
-
     if (!cancelled) {
-      setTimeout(loadLoop, 2000);
+      setTimeout(pollLive, 2000);
     }
   }
 
-  loadLoop();
+  pollLive();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
+useEffect(() => {
+  let cancelled = false;
+
+  async function pollStorage() {
+    if (cancelled) return;
+
+    try {
+      const data = await getStorageSnapshot();
+
+      if (!cancelled) {
+        setStorage(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (!cancelled) {
+      setTimeout(pollStorage, 15000);
+    }
+  }
+
+  pollStorage();
 
   return () => {
     cancelled = true;

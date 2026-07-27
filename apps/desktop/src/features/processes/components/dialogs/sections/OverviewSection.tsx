@@ -1,4 +1,4 @@
-//features/processes/components/ProcessOverview.tsx
+//features/processes/components/dialogs/sections/ProcessOverview.tsx
 
 import ApplicationIcon from "@/components/shared/ApplicationIcon";
 import { Badge } from "@/components/ui/badge";

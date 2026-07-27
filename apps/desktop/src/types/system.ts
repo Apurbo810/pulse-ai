@@ -1,3 +1,6 @@
+//types/src/system.ts
+
+
 export interface CpuInfo {
   usage: number;
   user: number;
@@ -77,13 +80,22 @@ export interface DevicesInfo {
 export interface ProcessInfo {
   pid: number;
   name: string;
-  cpu: number;
-  memory: number;
-  executablePath: string | null;
 
+  cpu: number;
   gpu?: number;
   disk?: number;
+  memory: number;
+
+  executablePath: string | null;
+
   status?: "Running" | "Suspended" | "Not Responding";
 
   isCritical: boolean;
+
+  // Phase 3.4
+  startTime?: string | null;
+  owner?: string | null;
+  priority?: number;
+  commandLine?: string | null;
 }
+

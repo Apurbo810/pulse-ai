@@ -1,4 +1,4 @@
-//features/processes/components/ProcessRow.tsx
+//features/processes/components/tableProcessRow.tsx
 
 import { ChevronDown, ChevronRight } from "lucide-react";
 import ApplicationIcon from "@/components/shared/ApplicationIcon";
@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import ProcessActions from "./ProcessActions";
+import ProcessActions from "../actions/ProcessActions";
 
 interface ProcessRowProps {
   process: ProcessInfo;
