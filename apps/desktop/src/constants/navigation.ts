@@ -7,6 +7,7 @@ import {
   Wrench,
   Bot,
   Settings,
+  ShieldAlert,
 } from "lucide-react";
 
 
@@ -30,6 +31,11 @@ export const navigation = [
     title: "Processes",
     icon: FolderKanban,
     href: "/processes",
+  },
+  {
+    title: "Analysis",
+    href: "/analysis",
+    icon: ShieldAlert,
   },
   {
     title: "Gaming",

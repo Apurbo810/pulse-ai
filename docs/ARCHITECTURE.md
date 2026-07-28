@@ -100,20 +100,24 @@ terminating applications.
 Running Processes
         │
         ▼
-Process Analyzer
+Process Analysis Engine
         │
         ├── CPU Analyzer
         ├── Memory Analyzer
         ├── GPU Analyzer
-        └── Disk Analyzer
+        ├── Disk Analyzer
+        └── Suspicious Analyzer
                 │
                 ▼
-        ProcessAnalysis
+         ProcessAnalysis[]
                 │
                 ▼
-Severity
-Reason
-Recommendation
+        Severity
+        Title
+        Reason
+                │
+                ▼
+          Analysis UI
 ```
 
 Each analyzer is responsible for:
@@ -122,10 +126,10 @@ Each analyzer is responsible for:
 - Applying configurable thresholds.
 - Assigning a severity level.
 - Producing a human-readable explanation.
-- Generating actionable optimization recommendations.
+- Returning standardized ProcessAnalysis objects.
 
-Future analyzers will extend this pipeline with suspicious process detection,
-AI diagnostics, and optimization suggestions.
+Future enhancements will extend this pipeline with AI diagnostics,
+optimization recommendations, and intelligent health scoring.
 
 ## Monitoring Flow
 
@@ -242,6 +246,7 @@ Current routes:
 - /
 - /monitoring
 - /processes
+- /analysis
 - /gaming
 - /optimizer
 - /ai
@@ -292,6 +297,12 @@ All routes share a common application layout through `AppLayout` and render feat
 - Critical process protection
 - Process analysis framework
 - CPU analysis
+- Memory Analyzer
+- GPU Analyzer
+- Disk Analyzer
+- Suspicious Process Analyzer
+- Analysis Engine
+- Severity Classification
 
 The shared monitoring service (`monitor.ts`) centralizes system data collection.
 
@@ -315,6 +326,14 @@ Windows process detection.
 
 Upcoming modules include:
 
+Upcoming enhancements
+
+- AI explanations
+- Optimization recommendations
+- Health score
+- Severity summaries
+- Process grouping
+- Analysis filters
 - Gaming Mode
 - Optimizer
 - AI Diagnostics
@@ -324,7 +343,7 @@ Each feature will remain isolated while sharing common monitoring data through r
      
 ## Project Structure   
 
-               
+        
 ```
 pulse-ai
 ├─ .agents
@@ -384,6 +403,14 @@ pulse-ai
 │     │  │  └─ navigation.ts
 │     │  ├─ features
 │     │  │  ├─ ai
+│     │  │  ├─ analysis
+│     │  │  │  ├─ AnalysisPage.tsx
+│     │  │  │  ├─ components
+│     │  │  │  │  ├─ AnalysisCard.tsx
+│     │  │  │  │  └─ EmptyState.tsx
+│     │  │  │  ├─ hooks
+│     │  │  │  │  └─ useAnalysis.ts
+│     │  │  │  └─ SeverityBadge.tsx
 │     │  │  ├─ dashboard
 │     │  │  │  ├─ components
 │     │  │  │  │  └─ StatCard.tsx
@@ -407,11 +434,13 @@ pulse-ai
 │     │  │  ├─ optimizer
 │     │  │  ├─ processes
 │     │  │  │  ├─ analysis
+│     │  │  │  │  ├─ analysisEngine.ts
 │     │  │  │  │  ├─ cpuAnalyzer.ts
 │     │  │  │  │  ├─ diskAnalyzer.ts
 │     │  │  │  │  ├─ gpuAnalyzer.ts
 │     │  │  │  │  ├─ index.ts
 │     │  │  │  │  ├─ memoryAnalyzer.ts
+│     │  │  │  │  ├─ suspiciousAnalyzer.ts
 │     │  │  │  │  ├─ test.ts
 │     │  │  │  │  └─ types.ts
 │     │  │  │  ├─ components

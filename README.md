@@ -58,6 +58,14 @@ pulse-ai
 │     │  │  └─ navigation.ts
 │     │  ├─ features
 │     │  │  ├─ ai
+│     │  │  ├─ analysis
+│     │  │  │  ├─ AnalysisPage.tsx
+│     │  │  │  ├─ components
+│     │  │  │  │  ├─ AnalysisCard.tsx
+│     │  │  │  │  └─ EmptyState.tsx
+│     │  │  │  ├─ hooks
+│     │  │  │  │  └─ useAnalysis.ts
+│     │  │  │  └─ SeverityBadge.tsx
 │     │  │  ├─ dashboard
 │     │  │  │  ├─ components
 │     │  │  │  │  └─ StatCard.tsx
@@ -81,11 +89,13 @@ pulse-ai
 │     │  │  ├─ optimizer
 │     │  │  ├─ processes
 │     │  │  │  ├─ analysis
+│     │  │  │  │  ├─ analysisEngine.ts
 │     │  │  │  │  ├─ cpuAnalyzer.ts
 │     │  │  │  │  ├─ diskAnalyzer.ts
 │     │  │  │  │  ├─ gpuAnalyzer.ts
 │     │  │  │  │  ├─ index.ts
 │     │  │  │  │  ├─ memoryAnalyzer.ts
+│     │  │  │  │  ├─ suspiciousAnalyzer.ts
 │     │  │  │  │  ├─ test.ts
 │     │  │  │  │  └─ types.ts
 │     │  │  │  ├─ components

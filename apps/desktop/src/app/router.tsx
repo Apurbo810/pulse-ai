@@ -6,6 +6,7 @@ import DashboardPage from "@/features/dashboard/DashboardPage";
 import MonitoringPage from "@/features/monitoring/pages/MonitoringPage";
 import StoragePage from "@/features/storage/pages/StoragePage";
 import ProcessesPage from "@/features/processes/ProcessesPage";
+import AnalysisPage from "@/features/analysis/AnalysisPage";
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
       {
         path: "processes",
         element: <ProcessesPage />,
+      },
+      {
+        path: "analysis",
+        element: <AnalysisPage />,
       },
     ],
   },

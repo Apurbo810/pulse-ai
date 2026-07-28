@@ -1,4 +1,5 @@
 // src/lib/monitor.ts
+import type { ProcessInfo } from "@/types/system";
 
 import type {
   CpuInfo,
@@ -18,10 +19,12 @@ export interface SystemSnapshot {
   network: NetworkInfo;
   displays: DisplayInfo[];
   devices: DevicesInfo;
+
+  processes: ProcessInfo[];
 }
 
 export async function getSystemSnapshot(): Promise<SystemSnapshot> {
-  const [cpu, memory, gpu, storage, network, displays, devices,] = await Promise.all([
+  const [cpu, memory, gpu, storage, network, displays, devices, processes] = await Promise.all([
     window.system.getCpu(),
     window.system.getMemory(),
     window.system.getGpu(),
@@ -29,22 +32,19 @@ export async function getSystemSnapshot(): Promise<SystemSnapshot> {
     window.system.getNetwork(),
     window.system.getDisplayInfo(),
     window.system.getDevices(),
-
+    window.system.getProcesses(),
   ]);
-const snapshot = {
-  cpu,
-  memory,
-  gpu,
-  storage,
-  network,
-  displays,
-  devices,
-};
 
-console.log(snapshot);
-
-return snapshot;
-
+  return {
+    cpu,
+    memory,
+    gpu,
+    storage,
+    network,
+    displays,
+    devices,
+    processes,
+  };
 }
 
 // ----------------------
@@ -122,4 +122,23 @@ export async function getHardwareSnapshot() {
     displays,
     devices,
   };
+}
+
+
+export function subscribeMonitoring(
+  listener: (snapshot: SystemSnapshot) => void
+) {
+  listeners.add(listener);
+
+  if (currentSnapshot) {
+    listener(currentSnapshot);
+  }
+
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+export function getCurrentSnapshot() {
+  return currentSnapshot;
 }
