@@ -20,7 +20,9 @@ const IGNORED_PROCESSES = new Set([
 export function analyzeCpu(
   process: ProcessInfo
 ): ProcessAnalysis | null {
-  const normalizedName = process.name.trim().toLowerCase();
+  const normalizedName = process.name
+    .trim()
+    .toLowerCase();
 
   // Ignore Windows internal processes
   if (
@@ -59,65 +61,9 @@ export function analyzeCpu(
 
     title: "High CPU Usage",
 
-    reason: `${process.name} is consuming ${cpu.toFixed(
-      1
-    )}% of CPU resources.`,
-
-    recommendation: getRecommendation(normalizedName),
+    reason: [
+      `${process.name} is currently consuming ${cpu.toFixed(1)}% of CPU resources.`,
+      `This exceeds the ${CPU_THRESHOLDS.medium}% analysis threshold.`,
+    ].join(" "),
   };
-}
-
-function getRecommendation(
-  processName: string
-): string {
-  if (
-    processName === "chrome.exe" ||
-    processName.includes("chrome")
-  ) {
-    return "Close unused tabs or disable resource-intensive extensions.";
-  }
-
-  if (
-    processName === "msedge.exe" ||
-    processName.includes("edge")
-  ) {
-    return "Close unused tabs or enable Sleeping Tabs to reduce CPU usage.";
-  }
-
-  if (
-    processName === "firefox.exe" ||
-    processName.includes("firefox")
-  ) {
-    return "Close unused tabs or check for extensions consuming excessive CPU.";
-  }
-
-  if (
-    processName === "discord.exe" ||
-    processName.includes("discord")
-  ) {
-    return "Restart Discord or disable overlays if CPU usage remains high.";
-  }
-
-  if (
-    processName === "code.exe" ||
-    processName.includes("visual studio code")
-  ) {
-    return "Check for busy extensions, language servers, or background tasks.";
-  }
-
-  if (
-    processName === "obs64.exe" ||
-    processName.includes("obs")
-  ) {
-    return "High CPU usage is expected while recording or streaming. Consider lowering the encoder preset or output resolution if performance becomes an issue.";
-  }
-
-  if (
-    processName === "steam.exe" ||
-    processName.includes("steam")
-  ) {
-    return "Steam may be downloading updates or verifying game files.";
-  }
-
-  return "If this application is not needed, close it. If CPU usage remains unusually high, investigate the process for potential issues.";
 }

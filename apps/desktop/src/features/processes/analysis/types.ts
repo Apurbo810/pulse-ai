@@ -17,5 +17,5 @@ export interface ProcessAnalysis {
 
   reason: string;
 
-  recommendation: string;
+  
 }

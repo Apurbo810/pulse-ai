@@ -137,9 +137,9 @@ Completed but only optional left.
 ## 🚧 Phase 3.5 — Pulse AI Analysis
 
 - [x] Analyze high CPU usage
-- [ ] Analyze high Memory usage
-- [ ] Analyze GPU bottlenecks
-- [ ] Analyze Disk bottlenecks
+- [x] Analyze high Memory usage
+- [x] Analyze GPU bottlenecks
+- [x] Analyze Disk bottlenecks
 - [ ] Detect suspicious processes
 - [ ] AI optimization recommendations
 
@@ -182,6 +182,16 @@ Completed but only optional left.
 - [ ] Ollama Integration
 - [ ] AI Diagnostics
 - [ ] AI Recommendations
+
+## Phase 7.5 — Pulse Memory
+
+- [ ] Persistent session history
+- [ ] Process lifetime statistics
+- [ ] System event timeline
+- [ ] AI session summaries
+- [ ] Natural language diagnostics
+
+
 
 ---
 
