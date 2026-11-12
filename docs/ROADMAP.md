@@ -150,15 +150,15 @@ Completed but only optional left.
 
 ## 🚧 Phase 3.6 - Analysis Improvements
 
-- [ ] Reduce false positives
-- [ ] Group by severity
-- [ ] Analysis summary cards
-- [ ] Filter by severity
-- [ ] Search
-- [ ] Sort by severity
-- [ ] Process details dialog
-- [ ] Timestamp
-- [ ] Auto refresh improvements
+- [X] Reduce false positives
+- [X] Group by severity
+- [X] Analysis summary cards
+- [X] Filter by severity
+- [X] Search
+- [X] Sort by severity
+- [X] Process details dialog
+- [X] Timestamp
+- [X] Auto refresh improvements
 
 ---
 
@@ -170,14 +170,20 @@ Completed but only optional left.
 
 ### Features
 
-- [ ] Explain detected issues in plain language
-- [ ] Performance optimization recommendations
-- [ ] Security recommendations
-- [ ] Gaming-specific recommendations
-- [ ] Overall system health score
-- [ ] AI explanation panel for each analysis
-- [ ] Suggested actions based on detected issues
-- [ ] AI-generated optimization priority list
+- [x] Explain detected issues in plain language
+- [x] Performance optimization recommendations
+- [x] Security recommendations
+- [ ] Gaming-specific recommendations (needs testing)
+- [x] Overall system health score
+- [x] AI explanation panel for each analysis
+- [x] Suggested actions based on detected issues
+- [ ] AI-generated optimization priority list (needs testing)
+
+### Known follow-ups
+
+- [ ] Add missing names (e.g. LsaIso.exe) to the critical process list
+- [ ] Real game detection for gaming tips (Week 5)
+- [ ] Replace rule-based text with LLM output (Week 8)
 
 ---
 

@@ -529,3 +529,79 @@ All notable changes to Pulse AI will be documented in this file.
 - Removed temporary CPU debugging logs.
 - Removed experimental CPU investigation code.
 - Removed redundant renderer-driven CPU sampling.
+
+
+<!-- pulse-ai/docs/CHANGELOG.md  (add at the end of the file) -->
+
+## [0.11.0-dev] - 2026-11-09
+
+### Added
+
+#### Analysis Improvements (Phase 3.6)
+
+- Added analysis summary cards showing the number of issues per severity.
+- Added filtering by severity (click a summary card to filter).
+- Added search by process name, PID, issue title or reason.
+- Added sorting by severity, process name and longest-running issue.
+- Added grouping of results by severity.
+- Added a process details dialog for each analysis result.
+- Added detection timestamps on analysis cards and a "last updated" time on the page.
+- Added a manual Refresh button.
+- Added shared analysis helpers (`shared.ts`) for severity classification and the ignored-process list.
+- Added `id`, `category` and `detectedAt` fields to `ProcessAnalysis`.
+- Added sustained-sample tracking so an issue is only reported after it persists for several samples (3 for CPU, GPU and disk; 2 for memory).
+
+#### AI Insights (Phase 3.7)
+
+- Added a rule-based insights engine in `features/analysis/insights/`.
+- Added plain-language explanations for every analysis category.
+- Added performance recommendations, including application-specific tips for Chrome, Edge, Firefox, Discord, VS Code, OBS and Steam.
+- Added security recommendations for suspicious-process findings.
+- Added gaming recommendations for common background applications.
+- Added suggested actions: Open File Location and End Task (with a confirmation click; protected processes cannot be ended).
+- Added an overall system health score (0–100) with a status label.
+- Added a priority list ("Fix these first") ranked by severity, issue duration and security risk.
+- Added the `useInsights()` hook.
+- Added `HealthScoreCard`, `PriorityList` and `InsightPanel` components.
+
+### Changed
+
+#### Analysis
+
+- Rewrote the CPU, GPU, Disk, Memory and Suspicious analyzers to use the shared helpers and return a `category`.
+- Memory analysis now judges each process by its share of total RAM and only reports when the whole system is under memory pressure.
+- The analysis engine now sorts results by severity and returns stable result IDs.
+- Rewrote `useAnalysis()`. It now fetches processes and memory directly, skips a refresh if the previous one is still running, and pauses while the window is hidden.
+- The Analysis page no longer depends on `getSystemSnapshot()`, which removes eight IPC calls per refresh.
+- Analysis cards choose their icon by category instead of matching title text.
+- The details dialog now includes the AI Insights panel.
+
+#### Architecture
+
+- Analysis results now flow through a separate insights layer (`buildInsights()`), which adds explanations, recommendations, actions and priority without changing the analyzers.
+- Recommendations live in the insights layer rather than in `ProcessAnalysis`, which keeps the analysis model simple.
+
+### Fixed
+
+- Fixed the Disk analyzer comparing bytes per second against MB/s thresholds.
+- Fixed the Memory analyzer flagging every process whenever system memory was high.
+- Fixed `explorer.exe` being reported as a possible process impersonation.
+- Reduced false positives from the random-name check on legitimate long Windows process names.
+- Stopped reporting "Missing Executable Path" for system-owned processes and for processes where Windows hides all details because the app is not running as administrator.
+- Capped the health-score penalty for each severity so many minor notices cannot reduce the score to zero.
+
+### Removed
+
+- Removed the manual `analysis/test.ts` script.
+
+### Known Issues
+
+- Some protected Windows processes (for example `LsaIso.exe`) are not yet in the critical process list.
+- Gaming recommendations use a fixed list of applications until Game Detection is built.
+- Insight text is rule-based. Local LLM explanations are planned for Week 8.
+- Without administrator rights, Windows hides the path and owner of some processes, so some security checks cannot run.
+- The page header still shows "Dashboard" on every route.
+
+### Documentation
+
+- Updated `ROADMAP.md` for Phases 3.6 and 3.7.

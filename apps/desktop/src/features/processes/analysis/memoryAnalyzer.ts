@@ -1,91 +1,45 @@
-// features/processes/analysis/memoryAnalyzer.ts
+// apps/desktop/src/features/processes/analysis/memoryAnalyzer.ts
 
 import type { ProcessInfo } from "@/types/system";
-import type { ProcessAnalysis } from "./types";
+import type { AnalysisContext, Finding } from "./types";
+import { classify, isIgnored } from "./shared";
 
-const MEMORY_THRESHOLDS = {
-  medium: 75,
-  high: 85,
-  critical: 90,
+// Share of total RAM used by a single process (%)
+const MEMORY_SHARE_THRESHOLDS = {
+  medium: 10,
+  high: 20,
+  critical: 35,
 } as const;
 
-const IGNORED_PROCESSES = new Set([
-  "system idle process",
-  "system",
-  "registry",
-  "memory compression",
-  "secure system",
-]);
+// Only report when the whole system is under memory pressure
+const SYSTEM_MEMORY_GATE = 75;
 
-export function analyzeMemory(
-  process: ProcessInfo,
-  systemMemoryUsage: number
-): ProcessAnalysis | null {
-  const normalizedName = process.name
-    .trim()
-    .toLowerCase();
-
-  // Ignore Windows internal processes
-  if (
-    process.pid === 0 ||
-    IGNORED_PROCESSES.has(normalizedName)
-  ) {
-    return null;
-  }
-
-  // Ignore invalid values
-  if (
-    !Number.isFinite(systemMemoryUsage) ||
-    systemMemoryUsage <= 0
-  ) {
-    return null;
-  }
-
-  // Ignore healthy memory usage
-  if (
-    systemMemoryUsage < MEMORY_THRESHOLDS.medium
-  ) {
-    return null;
-  }
-
-  let severity: ProcessAnalysis["severity"];
-
-  if (
-    systemMemoryUsage >= MEMORY_THRESHOLDS.critical
-  ) {
-    severity = "critical";
-  } else if (
-    systemMemoryUsage >= MEMORY_THRESHOLDS.high
-  ) {
-    severity = "high";
-  } else {
-    severity = "medium";
-  }
-
-  return {
-    process,
-
-    severity,
-
-    title: "High Memory Usage",
-
-    reason: [
-      `System memory usage is ${systemMemoryUsage.toFixed(
-        1
-      )}%.`,
-      `${process.name} is currently using ${formatMemory(
-        process.memory
-      )} of memory.`,
-    ].join(" "),
-  };
+function formatMemory(memoryMB: number): string {
+  if (memoryMB >= 1024) return `${(memoryMB / 1024).toFixed(1)} GB`;
+  return `${memoryMB.toFixed(0)} MB`;
 }
 
-function formatMemory(
-  memoryMB: number
-): string {
-  if (memoryMB >= 1024) {
-    return `${(memoryMB / 1024).toFixed(1)} GB`;
-  }
+export function analyzeMemory(
+  p: ProcessInfo,
+  ctx: AnalysisContext
+): Finding | null {
+  if (isIgnored(p)) return null;
+  if (ctx.totalMemoryMB <= 0) return null;
+  if (ctx.memoryUsagePercent < SYSTEM_MEMORY_GATE) return null;
 
-  return `${memoryMB.toFixed(0)} MB`;
+  const share = (p.memory / ctx.totalMemoryMB) * 100;
+  const severity = classify(share, MEMORY_SHARE_THRESHOLDS);
+  if (!severity) return null;
+
+  return {
+    process: p,
+    severity,
+    category: "memory",
+    title: "High Memory Usage",
+    reason: `${p.name} is using ${formatMemory(p.memory)} (${share.toFixed(
+      1
+    )}% of RAM) while system memory is at ${ctx.memoryUsagePercent.toFixed(
+      0
+    )}%.`,
+  };
 }

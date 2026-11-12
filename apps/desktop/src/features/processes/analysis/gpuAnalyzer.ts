@@ -1,69 +1,23 @@
-// features/processes/analysis/gpuAnalyzer.ts
+// apps/desktop/src/features/processes/analysis/gpuAnalyzer.ts
 
 import type { ProcessInfo } from "@/types/system";
-import type { ProcessAnalysis } from "./types";
+import type { Finding } from "./types";
+import { classify, isIgnored } from "./shared";
 
-const GPU_THRESHOLDS = {
-  medium: 30,
-  high: 60,
-  critical: 90,
-} as const;
+const GPU_THRESHOLDS = { medium: 30, high: 60, critical: 90 } as const;
 
-const IGNORED_PROCESSES = new Set([
-  "system idle process",
-  "system",
-  "registry",
-  "memory compression",
-  "secure system",
-]);
+export function analyzeGpu(p: ProcessInfo): Finding | null {
+  if (isIgnored(p)) return null;
 
-export function analyzeGpu(
-  process: ProcessInfo
-): ProcessAnalysis | null {
-  const normalizedName = process.name
-    .trim()
-    .toLowerCase();
-
-  if (
-    process.pid === 0 ||
-    IGNORED_PROCESSES.has(normalizedName)
-  ) {
-    return null;
-  }
-
-    const gpu = process.gpu;
-
-    if (
-    gpu === undefined ||
-    !Number.isFinite(gpu) ||
-    gpu <= 0
-    ) {
-    return null;
-    }
-
-  if (gpu < GPU_THRESHOLDS.medium) {
-    return null;
-  }
-
-  let severity: ProcessAnalysis["severity"];
-
-  if (gpu >= GPU_THRESHOLDS.critical) {
-    severity = "critical";
-  } else if (gpu >= GPU_THRESHOLDS.high) {
-    severity = "high";
-  } else {
-    severity = "medium";
-  }
+  const gpu = p.gpu ?? 0;
+  const severity = classify(gpu, GPU_THRESHOLDS);
+  if (!severity) return null;
 
   return {
-    process,
-
+    process: p,
     severity,
-
+    category: "gpu",
     title: "High GPU Usage",
-
-    reason: `${process.name} is currently using ${gpu.toFixed(
-      1
-    )}% of GPU resources.`,
+    reason: `${p.name} is using ${gpu.toFixed(1)}% of GPU resources.`,
   };
 }

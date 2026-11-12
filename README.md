@@ -58,13 +58,25 @@ pulse-ai
 │     │  │  └─ navigation.ts
 │     │  ├─ features
 │     │  │  ├─ ai
+│     │  │  │  └─ ai.ts
 │     │  │  ├─ analysis
 │     │  │  │  ├─ AnalysisPage.tsx
 │     │  │  │  ├─ components
 │     │  │  │  │  ├─ AnalysisCard.tsx
-│     │  │  │  │  └─ EmptyState.tsx
+│     │  │  │  │  ├─ EmptyState.tsx
+│     │  │  │  │  ├─ HealthScoreCard.tsx
+│     │  │  │  │  ├─ InsightPanel.tsx
+│     │  │  │  │  └─ PriorityList.tsx
 │     │  │  │  ├─ hooks
-│     │  │  │  │  └─ useAnalysis.ts
+│     │  │  │  │  ├─ useAnalysis.ts
+│     │  │  │  │  └─ useInsights.ts
+│     │  │  │  ├─ insights
+│     │  │  │  │  ├─ buildInsights.ts
+│     │  │  │  │  ├─ explanations.ts
+│     │  │  │  │  ├─ healthScore.ts
+│     │  │  │  │  ├─ priority.ts
+│     │  │  │  │  ├─ recommendations.ts
+│     │  │  │  │  └─ types.ts
 │     │  │  │  └─ SeverityBadge.tsx
 │     │  │  ├─ dashboard
 │     │  │  │  ├─ components
@@ -95,8 +107,8 @@ pulse-ai
 │     │  │  │  │  ├─ gpuAnalyzer.ts
 │     │  │  │  │  ├─ index.ts
 │     │  │  │  │  ├─ memoryAnalyzer.ts
+│     │  │  │  │  ├─ shared.ts
 │     │  │  │  │  ├─ suspiciousAnalyzer.ts
-│     │  │  │  │  ├─ test.ts
 │     │  │  │  │  └─ types.ts
 │     │  │  │  ├─ components
 │     │  │  │  │  ├─ actions
@@ -161,7 +173,8 @@ pulse-ai
 │     ├─ tsconfig.json
 │     ├─ tsconfig.node.json
 │     ├─ vite.config.ts
-│     └─ vite.config.ts.timestamp-1784449007718-571f3bd1253da.mjs
+│     ├─ vite.config.ts.timestamp-1784449007718-571f3bd1253da.mjs
+│     └─ vite.config.ts.timestamp-1793547160027-44dc9258262ad.mjs
 ├─ docs
 │  ├─ ARCHITECTURE.md
 │  ├─ CHANGELOG.md

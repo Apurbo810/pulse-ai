@@ -1,92 +1,112 @@
+// apps/desktop/src/features/processes/analysis/suspiciousAnalyzer.ts
+
 import type { ProcessInfo } from "@/types/system";
-import type { ProcessAnalysis } from "./types";
+import type { Finding } from "./types";
 
-const WINDOWS_SYSTEM_PATH = "c:\\windows\\system32";
+// Where each well-known Windows process is expected to live
+const EXPECTED_DIRECTORIES: Record<string, string[]> = {
+  "svchost.exe": ["c:\\windows\\system32", "c:\\windows\\syswow64"],
+  "lsass.exe": ["c:\\windows\\system32"],
+  "services.exe": ["c:\\windows\\system32"],
+  "csrss.exe": ["c:\\windows\\system32"],
+  "wininit.exe": ["c:\\windows\\system32"],
+  "smss.exe": ["c:\\windows\\system32"],
+  "winlogon.exe": ["c:\\windows\\system32"],
+  "explorer.exe": ["c:\\windows", "c:\\windows\\syswow64"],
+};
 
-const WINDOWS_PROCESS_NAMES = new Set([
-  "svchost.exe",
-  "lsass.exe",
-  "services.exe",
-  "csrss.exe",
-  "wininit.exe",
-  "smss.exe",
-  "winlogon.exe",
-  "explorer.exe",
-]);
+const SYSTEM_OWNERS = ["system", "local service", "network service"];
 
 function normalize(path: string | null): string {
   return path?.trim().toLowerCase() ?? "";
 }
 
-export function analyzeSuspicious(
-  process: ProcessInfo
-): ProcessAnalysis | null {
-  const path = normalize(process.executablePath);
-  const name = process.name.toLowerCase();
-
-if (process.pid === 0) {
-  return null;
+function isTrustedLocation(path: string): boolean {
+  return (
+    path.startsWith("c:\\windows\\") ||
+    path.startsWith("c:\\program files\\") ||
+    path.startsWith("c:\\program files (x86)\\")
+  );
 }
-  // Missing executable path
-    if (!path && !process.isCritical) {
-    return {
-        process,
-        severity: "medium",
-        title: "Missing Executable Path",
-        reason: `${process.name} has no executable path available.`,
-    };
-    }
 
-  // Running from Temp folder
-  if (
-    path.includes("\\temp\\") ||
-    path.includes("\\appdata\\local\\temp\\")
-  ) {
+function looksRandom(baseName: string): boolean {
+  if (baseName.length < 12) return false;
+
+  const digits = (baseName.match(/\d/g) ?? []).length;
+  const vowels = (baseName.match(/[aeiou]/g) ?? []).length;
+
+  return digits / baseName.length > 0.3 || vowels / baseName.length < 0.2;
+}
+
+export function analyzeSuspicious(p: ProcessInfo): Finding | null {
+  if (p.pid === 0 || p.pid === 4) return null;
+
+  const path = normalize(p.executablePath);
+  const name = p.name.trim().toLowerCase();
+  const owner = (p.owner ?? "").toLowerCase();
+
+  // Missing executable path (common for protected system processes)
+  if (!path) {
+    if (p.isCritical) return null;
+    // No owner either means Windows hid the details from us (we are not
+    // running as administrator), so this is not a real finding.
+    if (!owner) return null;
+    if (SYSTEM_OWNERS.some((o) => owner.includes(o))) return null;
+
     return {
-      process,
-      severity: "high",
-      title: "Running From Temporary Folder",
-      reason: `${process.name} is running from a temporary directory.`,
+      process: p,
+      severity: "low",
+      category: "suspicious",
+      title: "Missing Executable Path",
+      reason: `${p.name} has no executable path available.`,
     };
   }
 
-  // Running from Downloads
+  // Windows process running from an unexpected folder
+  const expected = EXPECTED_DIRECTORIES[name];
+  if (expected && !expected.some((dir) => path === `${dir}\\${name}`)) {
+    return {
+      process: p,
+      severity: "critical",
+      category: "suspicious",
+      title: "Possible Process Impersonation",
+      reason: `${p.name} is not running from its expected Windows folder.`,
+    };
+  }
+
+  // Temporary folder
+  if (path.includes("\\appdata\\local\\temp\\")) {
+    return {
+      process: p,
+      severity: "high",
+      category: "suspicious",
+      title: "Running From Temporary Folder",
+      reason: `${p.name} is running from a temporary directory.`,
+    };
+  }
+
+  // Downloads folder
   if (path.includes("\\downloads\\")) {
     return {
-      process,
-      severity: "high",
-      title: "Running From Downloads",
-      reason: `${process.name} is running from the Downloads folder.`,
-    };
-  }
-
-  // Windows process outside System32
-  if (
-    WINDOWS_PROCESS_NAMES.has(name) &&
-    !path.startsWith(WINDOWS_SYSTEM_PATH)
-  ) {
-    return {
-      process,
-      severity: "critical",
-      title: "Possible Process Impersonation",
-      reason: `${process.name} is not running from the expected Windows System32 directory.`,
-    };
-  }
-
-  // Random executable names
-  const baseName = name.replace(".exe", "");
-
-  if (/^[a-z0-9]{12,}$/i.test(baseName)) {
-    return {
-      process,
+      process: p,
       severity: "medium",
-      title: "Unusual Executable Name",
-      reason: `${process.name} has an unusually long or random executable name.`,
+      category: "suspicious",
+      title: "Running From Downloads",
+      reason: `${p.name} is running from the Downloads folder.`,
     };
   }
 
-
-  
+  // Random-looking name (skip trusted install locations)
+  const baseName = name.replace(/\.exe$/, "");
+  if (!isTrustedLocation(path) && looksRandom(baseName)) {
+    return {
+      process: p,
+      severity: "medium",
+      category: "suspicious",
+      title: "Unusual Executable Name",
+      reason: `${p.name} has an unusually long or random-looking name.`,
+    };
+  }
 
   return null;
 }

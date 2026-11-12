@@ -1,28 +1,28 @@
+<!-- pulse-ai/docs/ARCHITECTURE.md -->
+
+# Pulse AI Architecture
+
 ## Project Overview
 
 Pulse AI is a Windows-first desktop application designed to monitor, diagnose, and optimize system performance through a modular, feature-first architecture.
-The application centralizes system monitoring into a shared pipeline that supplies data to multiple features while minimizing duplicated IPC calls.
-The application centralizes system monitoring into a
-shared pipeline that supplies data to multiple features while minimizing duplicated
-IPC calls.
+
+The application collects system data in the Electron main process and shares it with multiple features, while keeping all operating system access out of the React renderer.
 
 ## Technology Stack
 
-Electron
-React
-TypeScript
-React Router
-Tailwind CSS v4
-shadcn/ui
-Lucide React
-systeminformation
-PowerShell (Windows Performance Counters)
-
-
+- Electron
+- React
+- TypeScript
+- React Router
+- Tailwind CSS v4
+- shadcn/ui
+- Lucide React
+- systeminformation
+- PowerShell (Windows Performance Counters)
 
 ## Architecture
 
-
+```text
 Electron Main Process
         │
         ▼
@@ -32,7 +32,7 @@ Electron Services
 IPC Main
         │
         ▼
-Preload API
+Preload API (window.system)
         │
         ▼
 React Renderer
@@ -45,42 +45,52 @@ Feature Modules
         │
         ▼
 Reusable Components
+```
 
 ## Monitoring Pipeline
 
-System monitoring is centralized within the Electron main process to reduce
-duplicate system calls and provide a single source of truth for performance
-metrics.
+### Currently implemented
+
+The Electron main process owns the data that is expensive or stateful to collect. The renderer asks for the rest through IPC.
 
 ```text
 systeminformation
         │
         ▼
-Central Monitoring Service
+Electron Services (system.ts)
         │
-        ├── CPU Sampler (2s)
-        ├── Memory Snapshot (Live)
-        ├── GPU Cache (10s)
-        ├── Network Snapshot (Live)
-        ├── Storage Snapshot (15s)
-        └── Hardware Snapshot (Startup)
-                │
-                ▼
-          Cached System State
+        ├── CPU Sampler        (main process, every 2s, cached)
+        ├── GPU / Display Cache (main process, 10s cache)
+        ├── Memory             (read on request)
+        ├── Network            (read on request)
+        ├── Storage            (read on request)
+        └── Hardware / Devices (read on request, loaded once by the UI)
                 │
                 ▼
              IPC Main
                 │
                 ▼
-            Preload API
+         Preload API (window.system)
                 │
                 ▼
            monitor.ts
                 │
         ┌───────┴────────┐
         ▼                ▼
-    Dashboard       Monitoring
+    Dashboard        Monitoring
 ```
+
+`monitor.ts` exposes three groups of data with different refresh rates:
+
+- Live metrics (CPU, memory, GPU, network): every 2 seconds.
+- Storage summary: every 15 seconds.
+- Hardware (displays, input devices): loaded once.
+
+### Planned improvements
+
+- Move the memory, network, storage and hardware caches into the main process, so the main process is the single source of truth for all metrics.
+- Push snapshots from main to the renderer instead of polling.
+- Share one polling loop between Dashboard and Monitoring.
 
 ### Design Goals
 
@@ -89,108 +99,6 @@ Central Monitoring Service
 - Independent polling intervals based on data volatility.
 - Shared snapshots across multiple renderer pages.
 - Minimized IPC traffic between Electron and React.
-
-## Process Analysis Architecture
-
-The Process Manager includes a lightweight analysis engine that evaluates
-running processes and generates diagnostic information without modifying or
-terminating applications.
-
-```text
-Running Processes
-        │
-        ▼
-Process Analysis Engine
-        │
-        ├── CPU Analyzer
-        ├── Memory Analyzer
-        ├── GPU Analyzer
-        ├── Disk Analyzer
-        └── Suspicious Analyzer
-                │
-                ▼
-         ProcessAnalysis[]
-                │
-                ▼
-        Severity
-        Title
-        Reason
-                │
-                ▼
-          Analysis UI
-```
-
-Each analyzer is responsible for:
-
-- Ignoring Windows system processes.
-- Applying configurable thresholds.
-- Assigning a severity level.
-- Producing a human-readable explanation.
-- Returning standardized ProcessAnalysis objects.
-
-Future enhancements will extend this pipeline with AI diagnostics,
-optimization recommendations, and intelligent health scoring.
-
-## Monitoring Flow
-
-systeminformation
-        │
-        ▼
-Electron Services
-        │
-        ├───────────────┐
-        ▼               ▼
-Windows Performance   systeminformation
-Counters              APIs
-(PowerShell)
-        │               │
-        └──────┬────────┘
-               ▼
-        IPC Main
-               ▼
-        Preload API
-               ▼
-        monitor.ts
-               ▼
-        SystemSnapshot      
-        
-        
-
-## Folder Structure
-
-        apps/
-        packages/
-        docs/
-
-
-## Storage Architecture
-
-Storage is implemented as its own feature module.
-
-        Storage
-        │
-        ├── Storage Overview
-        ├── Physical Drives
-        ├── Partitions
-        └── Drive Details
-
-        Electron Services
-                │
-                ▼
-        systeminformation
-        (fsSize, diskLayout, blockDevices)
-                │
-                ▼
-        IPC
-                │
-                ▼
-        Preload
-                │
-                ▼
-        useStorage()
-                │
-                ▼
-        Storage UI
 
 ## Process Manager Architecture
 
@@ -235,22 +143,135 @@ Implemented features include:
 
 Critical process protection is enforced in both the Electron backend and the React frontend to prevent accidental termination of essential Windows processes.
 
-The React renderer is responsible only for presenting process data and handling user interactions. All operating system access, process termination, and security validation are performed by the Electron backend, ensuring the renderer cannot bypass critical process protection.
+The React renderer is responsible only for presenting process data and handling user interactions. All operating system access, process termination, and security validation are performed by the Electron backend.
+
+## Process Analysis Architecture
+
+The analysis engine evaluates running processes and produces diagnostic findings without modifying or terminating anything. It runs in the React renderer, on process data supplied by the Electron backend.
+
+```text
+window.system.getProcesses() + window.system.getMemory()
+                │
+                ▼
+          useAnalysis()          (auto refresh, skips overlapping
+                │                 requests, pauses while hidden)
+                ▼
+     Process Analysis Engine
+                │
+                ├── CPU Analyzer
+                ├── Memory Analyzer
+                ├── GPU Analyzer
+                ├── Disk Analyzer
+                └── Suspicious Analyzer
+                │
+                ▼
+     Sustained-sample tracking
+     (an issue must persist for several samples)
+                │
+                ▼
+         ProcessAnalysis[]
+         (id, category, severity, title, reason, detectedAt)
+                │
+                ▼
+          Analysis UI
+```
+
+Each analyzer is responsible for:
+
+- Ignoring Windows system processes (shared helper in `shared.ts`).
+- Applying configurable thresholds.
+- Assigning a severity level (low, medium, high, critical).
+- Producing a human-readable reason.
+- Returning a standardized `Finding`. The engine adds the `id` and `detectedAt` fields.
+
+Notes:
+
+- The disk analyzer converts bytes per second to MB/s before applying thresholds.
+- The memory analyzer judges each process by its share of total RAM and only reports when system memory is under pressure.
+- An issue is only reported after it persists for several samples (3 for CPU, GPU and disk; 2 for memory; 1 for suspicious findings), which reduces false positives from short spikes.
+- Some checks need administrator rights to see a process path and owner. Without them, those checks are skipped.
+
+## AI Insights Architecture
+
+The insights layer turns analysis results into explanations, recommendations and a health score. It is currently rule-based, so it works offline and uses almost no resources.
+
+```text
+ProcessAnalysis[]
+        │
+        ▼
+    useInsights()
+        │
+        ▼
+    buildInsights()
+        │
+        ├── explanations.ts     plain-language explanation
+        ├── recommendations.ts  performance, security and gaming tips
+        │                       and suggested actions
+        ├── priority.ts         priority score for each issue
+        └── healthScore.ts      overall system health (0-100)
+        │
+        ▼
+Insight[] + HealthScore
+        │
+        ▼
+Analysis UI
+(HealthScoreCard, PriorityList, InsightPanel)
+```
+
+- Insights are separate from `ProcessAnalysis`, so the analyzers stay simple.
+- Suggested actions (Open File Location, End Task) go through `window.system`, so the Electron backend still enforces critical process protection.
+- Gaming tips use a fixed list of background applications until Game Detection is built.
+- The text generation can be replaced by a local LLM (Roadmap Week 8) without changing the UI.
+
+## Storage Architecture
+
+Storage is implemented as its own feature module.
+
+```text
+Storage
+│
+├── Storage Overview
+├── Physical Drives
+├── Partitions
+└── Drive Details
+
+Electron Services
+        │
+        ▼
+systeminformation
+(fsSize, diskLayout, blockDevices)
+        │
+        ▼
+IPC
+        │
+        ▼
+Preload
+        │
+        ▼
+useStorage()
+        │
+        ▼
+Storage UI
+```
 
 ## Routing
 
 React Router is used for navigation between feature pages.
 
-Current routes:
+Routes with pages:
 
-- /
-- /monitoring
-- /processes
-- /analysis
-- /gaming
-- /optimizer
-- /ai
-- /settings
+- `/` (Dashboard)
+- `/monitoring`
+- `/storage`
+- `/processes`
+- `/analysis`
+
+Placeholder routes (in the sidebar, no page yet):
+
+- `/gaming`
+- `/optimizer`
+- `/ai`
+- `/settings`
 
 All routes share a common application layout through `AppLayout` and render feature pages using React Router's `Outlet`.
 
@@ -274,7 +295,7 @@ All routes share a common application layout through `AppLayout` and render feat
 - Memory
 - GPU
 - Storage Summary
-- Storage Devices & Partitions
+- Storage Devices and Partitions
 - Network Adapter
 - Network Throughput
 - Display Detection
@@ -285,8 +306,7 @@ All routes share a common application layout through `AppLayout` and render feat
 ### Process Manager
 
 - Live process monitoring
-- Process filtering
-- Process sorting
+- Process filtering and sorting
 - Auto refresh
 - Persistent preferences
 - Application icons
@@ -295,56 +315,40 @@ All routes share a common application layout through `AppLayout` and render feat
 - Search Process Online
 - End Task
 - Critical process protection
-- Process analysis framework
-- CPU analysis
-- Memory Analyzer
-- GPU Analyzer
-- Disk Analyzer
-- Suspicious Process Analyzer
-- Analysis Engine
-- Severity Classification
 
-The shared monitoring service (`monitor.ts`) centralizes system data collection.
+### Analysis
 
-Dashboard and Monitoring consume a shared SystemSnapshot, ensuring a single source of truth while eliminating duplicated IPC calls.
+- CPU, Memory, GPU, Disk and Suspicious Process analyzers
+- Analysis engine with severity classification and sustained-sample tracking
+- Summary cards, severity filter, search, sorting and grouping
+- Process details dialog
+- Timestamps and auto refresh
+
+### AI Insights
+
+- Plain-language explanations
+- Performance, security and gaming recommendations
+- Suggested actions
+- Overall system health score
+- Priority list ("Fix these first")
 
 ## Planned Architecture
 
 Future features will build upon the shared monitoring and Electron service layers while maintaining a modular, feature-first architecture.
 
-Current implemented features:
+Upcoming modules:
 
-- Dashboard
-- Monitoring
-- Storage
-- Process Manager
-
-The Process Manager provides real-time process monitoring, filtering,
-sorting, live resource usage, application icons, process properties,
-Open File Location, Search Process Online, End Task, and protected
-Windows process detection.
-
-Upcoming modules include:
-
-Upcoming enhancements
-
-- AI explanations
-- Optimization recommendations
-- Health score
-- Severity summaries
-- Process grouping
-- Analysis filters
-- Gaming Mode
+- Real game detection and Gaming Mode
 - Optimizer
-- AI Diagnostics
-- System Notifications
+- History and analytics
+- Local LLM integration (Ollama) for AI diagnostics
+- System notifications
 
 Each feature will remain isolated while sharing common monitoring data through reusable services.
-     
-## Project Structure   
 
-        
-```
+## Project Structure
+
+```text
 pulse-ai
 ├─ .agents
 ├─ apps
@@ -368,35 +372,24 @@ pulse-ai
 │     ├─ package-lock.json
 │     ├─ package.json
 │     ├─ public
-│     │  ├─ electron-vite.animate.svg
-│     │  ├─ electron-vite.svg
-│     │  └─ vite.svg
 │     ├─ README.md
 │     ├─ release
-│     │  └─ 0.0.0
-│     │     └─ win-unpacked
 │     ├─ src
 │     │  ├─ app
-│     │  │  ├─ App.css
-│     │  │  └─ App.tsx
+│     │  │  ├─ App.tsx
+│     │  │  └─ router.tsx
 │     │  ├─ assets
-│     │  │  └─ logo
 │     │  ├─ components
-│     │  │  ├─ cards
+│     │  │  ├─ layout
+│     │  │  │  ├─ AppLayout.tsx
+│     │  │  │  ├─ Header.tsx
+│     │  │  │  ├─ MainContent.tsx
+│     │  │  │  └─ Sidebar.tsx
 │     │  │  ├─ navigation
 │     │  │  │  └─ NavItem.tsx
 │     │  │  ├─ shared
 │     │  │  │  └─ ApplicationIcon.tsx
 │     │  │  └─ ui
-│     │  │     ├─ badge.tsx
-│     │  │     ├─ button.tsx
-│     │  │     ├─ card.tsx
-│     │  │     ├─ chart.tsx
-│     │  │     ├─ context-menu.tsx
-│     │  │     ├─ dialog.tsx
-│     │  │     ├─ input.tsx
-│     │  │     ├─ progress.tsx
-│     │  │     └─ table.tsx
 │     │  ├─ constants
 │     │  │  ├─ app.ts
 │     │  │  ├─ colors.ts
@@ -405,32 +398,26 @@ pulse-ai
 │     │  │  ├─ ai
 │     │  │  ├─ analysis
 │     │  │  │  ├─ AnalysisPage.tsx
+│     │  │  │  ├─ SeverityBadge.tsx
 │     │  │  │  ├─ components
 │     │  │  │  │  ├─ AnalysisCard.tsx
-│     │  │  │  │  └─ EmptyState.tsx
+│     │  │  │  │  ├─ EmptyState.tsx
+│     │  │  │  │  ├─ HealthScoreCard.tsx
+│     │  │  │  │  ├─ InsightPanel.tsx
+│     │  │  │  │  └─ PriorityList.tsx
 │     │  │  │  ├─ hooks
-│     │  │  │  │  └─ useAnalysis.ts
-│     │  │  │  └─ SeverityBadge.tsx
+│     │  │  │  │  ├─ useAnalysis.ts
+│     │  │  │  │  └─ useInsights.ts
+│     │  │  │  └─ insights
+│     │  │  │     ├─ buildInsights.ts
+│     │  │  │     ├─ explanations.ts
+│     │  │  │     ├─ healthScore.ts
+│     │  │  │     ├─ priority.ts
+│     │  │  │     ├─ recommendations.ts
+│     │  │  │     └─ types.ts
 │     │  │  ├─ dashboard
-│     │  │  │  ├─ components
-│     │  │  │  │  └─ StatCard.tsx
-│     │  │  │  └─ DashboardPage.tsx
 │     │  │  ├─ gaming
 │     │  │  ├─ monitoring
-│     │  │  │  ├─ components
-│     │  │  │  │  ├─ CpuCard.tsx
-│     │  │  │  │  ├─ DevicesCard.tsx
-│     │  │  │  │  ├─ DiskUsageCard.tsx
-│     │  │  │  │  ├─ DisplayCard.tsx
-│     │  │  │  │  ├─ GpuCard.tsx
-│     │  │  │  │  ├─ HistoryChart.tsx
-│     │  │  │  │  ├─ MemoryCard.tsx
-│     │  │  │  │  ├─ NetworkCard.tsx
-│     │  │  │  │  └─ StorageCard.tsx
-│     │  │  │  ├─ hooks
-│     │  │  │  │  └─ useHistory.ts
-│     │  │  │  └─ pages
-│     │  │  │     └─ MonitoringPage.tsx
 │     │  │  ├─ optimizer
 │     │  │  ├─ processes
 │     │  │  │  ├─ analysis
@@ -440,73 +427,33 @@ pulse-ai
 │     │  │  │  │  ├─ gpuAnalyzer.ts
 │     │  │  │  │  ├─ index.ts
 │     │  │  │  │  ├─ memoryAnalyzer.ts
+│     │  │  │  │  ├─ shared.ts
 │     │  │  │  │  ├─ suspiciousAnalyzer.ts
-│     │  │  │  │  ├─ test.ts
 │     │  │  │  │  └─ types.ts
 │     │  │  │  ├─ components
-│     │  │  │  │  ├─ actions
-│     │  │  │  │  │  └─ ProcessActions.tsx
-│     │  │  │  │  ├─ dialogs
-│     │  │  │  │  │  ├─ ProcessPropertiesDialog.tsx
-│     │  │  │  │  │  └─ sections
-│     │  │  │  │  │     ├─ ExecutableSection.tsx
-│     │  │  │  │  │     ├─ OverviewSection.tsx
-│     │  │  │  │  │     ├─ PerformanceSection.tsx
-│     │  │  │  │  │     ├─ ProcessAdvancedSection.tsx
-│     │  │  │  │  │     └─ ProcessDetailsSection.tsx
-│     │  │  │  │  ├─ menus
-│     │  │  │  │  │  └─ ProcessContextMenu.tsx
-│     │  │  │  │  ├─ table
-│     │  │  │  │  │  ├─ ProcessRow.tsx
-│     │  │  │  │  │  ├─ ProcessTable.tsx
-│     │  │  │  │  │  └─ SortableHeader.tsx
-│     │  │  │  │  └─ toolbar
-│     │  │  │  │     ├─ ProcessFilterBar.tsx
-│     │  │  │  │     ├─ ProcessToolbar.tsx
-│     │  │  │  │     └─ RefreshIntervalSelect.tsx
 │     │  │  │  ├─ hooks
-│     │  │  │  │  └─ useProcesses.ts
 │     │  │  │  ├─ ProcessesPage.tsx
 │     │  │  │  ├─ types.ts
 │     │  │  │  └─ utils
-│     │  │  │     └─ preferences.ts
 │     │  │  ├─ settings
 │     │  │  ├─ shared
-│     │  │  │  └─ utils
-│     │  │  │     └─ status.ts
 │     │  │  └─ storage
-│     │  │     ├─ components
-│     │  │     │  ├─ PartitionCard.tsx
-│     │  │     │  ├─ StorageGroupCard.tsx
-│     │  │     │  └─ StorageOverview.tsx
-│     │  │     ├─ hooks
-│     │  │     │  └─ useStorage.ts
-│     │  │     ├─ pages
-│     │  │     │  ├─ DriveDetailsPage.tsx
-│     │  │     │  └─ StoragePage.tsx
-│     │  │     └─ utils
-│     │  │        └─ storageFormat.ts
 │     │  ├─ hooks
 │     │  │  └─ useSystemMonitor.ts
-│     │  ├─ index.css
 │     │  ├─ lib
-│     │  │  ├─ ai.ts
 │     │  │  ├─ electron.ts
 │     │  │  ├─ ipc.ts
 │     │  │  ├─ monitor.ts
 │     │  │  ├─ system.ts
 │     │  │  └─ utils.ts
 │     │  ├─ main.tsx
-│     │  ├─ styles
 │     │  ├─ types
 │     │  │  └─ system.ts
-│     │  ├─ utils
 │     │  └─ vite-env.d.ts
 │     ├─ test-cpu.js
 │     ├─ tsconfig.json
 │     ├─ tsconfig.node.json
-│     ├─ vite.config.ts
-│     └─ vite.config.ts.timestamp-1784449007718-571f3bd1253da.mjs
+│     └─ vite.config.ts
 ├─ docs
 │  ├─ ARCHITECTURE.md
 │  ├─ CHANGELOG.md
@@ -520,5 +467,4 @@ pulse-ai
 │  ├─ shared
 │  └─ ui
 └─ README.md
-
 ```
