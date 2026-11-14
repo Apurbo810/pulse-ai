@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# pulse-ai/.gitignore  (add these lines)
+apps/desktop/scripts/probe-result*.json

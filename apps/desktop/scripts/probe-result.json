@@ -1,0 +1,117 @@
+[
+  {
+    "name": "Running as administrator",
+    "ok": false,
+    "value": "no (some sensors need admin)"
+  },
+  {
+    "name": "CPU info",
+    "ok": true,
+    "value": "Ryzen 5 3500X 6-Core Processor, 6 cores / 6 threads, base 3.6 GHz, max 3.6 GHz"
+  },
+  {
+    "name": "CPU clock speed (live)",
+    "ok": true,
+    "value": "avg 3.6 GHz, min 3.6, max 3.6"
+  },
+  {
+    "name": "CPU temperature (systeminformation)",
+    "ok": false,
+    "value": "main null, max null, cores []"
+  },
+  {
+    "name": "CPU load per core",
+    "ok": true,
+    "value": "6 cores reported"
+  },
+  {
+    "name": "CPU voltage (Win32_Processor)",
+    "ok": true,
+    "value": "{\"CurrentVoltage\":11,\"CurrentClockSpeed\":3600,\"MaxClockSpeed\":3600,\"LoadPercentage\":18}"
+  },
+  {
+    "name": "CPU performance counter (% of base clock)",
+    "ok": true,
+    "value": "106"
+  },
+  {
+    "name": "ACPI thermal zone (needs admin)",
+    "ok": false,
+    "value": "error: Command failed: powershell.exe -NoProfile -NonInteractive -Command Get-CimInstance -Namespace root/wmi -ClassName MSAcpi_ThermalZoneTemperature -ErrorAction Stop | ForEach-Object { [math]::Round(($_.CurrentTemperature / 10) - 273.15, 1) }"
+  },
+  {
+    "name": "Memory and page file",
+    "ok": true,
+    "value": "total 17.1 GB, swap total 10.2 GB, swap used 0.5 GB"
+  },
+  {
+    "name": "Page file usage counter",
+    "ok": true,
+    "value": "4.64 %"
+  },
+  {
+    "name": "GPU (systeminformation)",
+    "ok": true,
+    "value": "[{\"model\":\"NVIDIA GeForce GTX 1650\",\"vram\":4096,\"util\":null,\"temp\":49.8,\"power\":8.46,\"clock\":300,\"vramUsed\":1262}]"
+  },
+  {
+    "name": "NVIDIA GPU (nvidia-smi)",
+    "ok": true,
+    "value": "NVIDIA GeForce GTX 1650, 49.80, 0 %, 8.47 W, 300 MHz, 405 MHz, 1262 MiB, 0x0000000000000001"
+  },
+  {
+    "name": "Disk queue length counter",
+    "ok": true,
+    "value": "0.002"
+  },
+  {
+    "name": "Disk activity time counter",
+    "ok": true,
+    "value": "0.1 %"
+  },
+  {
+    "name": "Disk throughput (systeminformation)",
+    "ok": false,
+    "value": "{}"
+  },
+  {
+    "name": "Disk health (SMART)",
+    "ok": true,
+    "value": "[{\"FriendlyName\":\"ETOPSO SSD 256GB\",\"HealthStatus\":\"Healthy\",\"OperationalStatus\":\"OK\",\"MediaType\":\"SSD\"},{\"FriendlyName\":\"WDC WD10EZEX-22MFCA0\",\"HealthStatus\":\"Healthy\",\"OperationalStatus\":\"OK\",\"MediaType\":\"HDD\"}]"
+  },
+  {
+    "name": "Network throughput",
+    "ok": true,
+    "value": "1 adapter(s), first: RadminVPN"
+  },
+  {
+    "name": "Battery",
+    "ok": false,
+    "value": "no battery (desktop)"
+  },
+  {
+    "name": "Fans (Win32_Fan)",
+    "ok": false,
+    "value": "none reported"
+  },
+  {
+    "name": "Power plan",
+    "ok": true,
+    "value": "Power Scheme GUID: 9897998c-92de-4669-853f-b7cd3ecb2790  (AMD RyzenT Balanced)"
+  },
+  {
+    "name": "Unexpected shutdowns / kernel power (System 41, 6008)",
+    "ok": true,
+    "value": "110 event(s)"
+  },
+  {
+    "name": "Application crashes (Application 1000)",
+    "ok": true,
+    "value": "110 event(s)"
+  },
+  {
+    "name": "Hardware errors (WHEA-Logger)",
+    "ok": true,
+    "value": "13 event(s)"
+  }
+]
