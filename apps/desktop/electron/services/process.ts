@@ -1,5 +1,6 @@
-//electron/services/process.ts
+// apps/desktop/electron/services/process.ts  
 
+import { app } from "electron";
 import si from "systeminformation";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
@@ -106,58 +107,62 @@ export async function getProcesses(): Promise<ProcessInfo[]> {
     getDiskUsageByProcess(),
   ]);
 
+  return processes.list.map((proc) => ({
+    pid: proc.pid,
+    name: proc.name,
 
+    cpu: Number.isFinite(proc.cpu) ? proc.cpu : 0,
+    gpu: gpuUsageByProcess.get(proc.pid) ?? 0,
+    disk: diskUsageByProcess.get(proc.pid) ?? 0,
+    memory: Number((proc.memRss / 1024).toFixed(2)),
 
-    return processes.list.map((process) => ({
-    pid: process.pid,
-    name: process.name,
+    executablePath: proc.path,
 
-    cpu: Number.isFinite(process.cpu) ? process.cpu : 0,
-    gpu: gpuUsageByProcess.get(process.pid) ?? 0,
-    disk: diskUsageByProcess.get(process.pid) ?? 0,
-    memory: Number((process.memRss / 1024).toFixed(2)),
-
-    executablePath: process.path,
-
-    startTime: process.started ?? null,
-    owner: process.user || null,
-    priority: process.priority,
-    commandLine: [process.command, process.params]
+    startTime: proc.started ?? null,
+    owner: proc.user || null,
+    priority: proc.priority,
+    commandLine: [proc.command, proc.params]
       .filter(Boolean)
       .join(" ")
       .trim(),
 
-    status: process.state.includes("suspended")
-      ? "Suspended"
-      : "Running",
+    status: proc.state?.includes("suspended") ? "Suspended" : "Running",
 
-    isCritical: isCriticalProcess(process.name),
+    isCritical: isCriticalProcess(proc.name, proc.path),
   }));
 }
 
 export async function endProcess(pid: number): Promise<void> {
   try {
-    // Find the process first
+    if (!Number.isInteger(pid) || pid <= 4) {
+      throw new Error("Invalid process ID.");
+    }
+
+    // Never end Pulse AI itself (main, renderer and helper processes)
+    const ownPids = new Set<number>([
+      process.pid,
+      ...app.getAppMetrics().map((metric) => metric.pid),
+    ]);
+    if (ownPids.has(pid)) {
+      throw new Error("Pulse AI cannot end its own processes.");
+    }
+
     const processes = await si.processes();
+    const proc = processes.list.find((p) => p.pid === pid);
 
-    const process = processes.list.find((p) => p.pid === pid);
-
-    if (!process) {
+    if (!proc) {
       throw new Error(`Process ${pid} not found.`);
     }
 
-    // Prevent killing protected Windows processes
-    if (isCriticalProcess(process.name)) {
+    if (isCriticalProcess(proc.name, proc.path)) {
       throw new Error(
-        `"${process.name}" is a protected Windows process and cannot be terminated.`
+        `"${proc.name}" is a protected Windows process and cannot be terminated.`
       );
     }
 
-    await execFileAsync("taskkill", [
-      "/PID",
-      String(pid),
-      "/F",
-    ]);
+    await execFileAsync("taskkill", ["/PID", String(pid), "/F"], {
+      windowsHide: true,
+    });
   } catch (error) {
     console.error(`Failed to terminate process ${pid}:`, error);
     throw error;

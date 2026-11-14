@@ -1,134 +1,153 @@
-  import { app, BrowserWindow } from 'electron'
-  import { fileURLToPath } from 'node:url'
-  import path from 'node:path'
-  import { ipcMain } from "electron";
-  import { getCpuInfo, getMemoryInfo,getGpuInfo, getStorageInfo,getNetworkInfo,getStorageDevices,getDisplayInfo, startCpuMonitoring, stopCpuMonitoring } from "./services/system";
-  import { getDevices } from "./services/devices";
-  import { getProcesses, endProcess  } from "./services/process";
-  import { getFileIcon } from "./services/icon";
-  import {openFileLocation } from "./services/shell"
-  const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// apps/desktop/electron/main.ts
 
-  // The built directory structure
-  //
-  // ├─┬─┬ dist
-  // │ │ └── index.html
-  // │ │
-  // │ ├─┬ dist-electron
-  // │ │ ├── main.js
-  // │ │ └── preload.mjs
-  // │
-  process.env.APP_ROOT = path.join(__dirname, '..')
+import { app, BrowserWindow } from 'electron'
+import { fileURLToPath } from 'node:url'
+import path from 'node:path'
+import fs from 'node:fs'
+import { ipcMain } from "electron";
+import { getCpuInfo, getMemoryInfo, getGpuInfo, getStorageInfo, getNetworkInfo, getStorageDevices, getDisplayInfo, startCpuMonitoring, stopCpuMonitoring } from "./services/system";
+import { getDevices } from "./services/devices";
+import { getProcesses, endProcess } from "./services/process";
+import { getFileIcon } from "./services/icon";
+import { openFileLocation } from "./services/shell"
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-  // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
-  export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
-  export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
-  export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
+// The built directory structure
+//
+// ├─┬─┬ dist
+// │ │ └── index.html
+// │ │
+// │ ├─┬ dist-electron
+// │ │ ├── main.js
+// │ │ └── preload.mjs
+// │
+process.env.APP_ROOT = path.join(__dirname, '..')
 
-  process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
+// 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
+export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
+export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
+export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
-  let win: BrowserWindow | null
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
-  function createWindow() {
-    win = new BrowserWindow({
-      icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
-      webPreferences: {
-        preload: path.join(__dirname, 'preload.mjs'),
-      },
-    })
+let win: BrowserWindow | null
 
-    // Test active push message to Renderer-process.
-    win.webContents.on('did-finish-load', () => {
-      win?.webContents.send('main-process-message', (new Date).toLocaleString())
-    })
+// The renderer can send anything over IPC, so check inputs before using them.
+function isUsablePath(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    value.length > 0 &&
+    path.isAbsolute(value) &&
+    fs.existsSync(value)
+  );
+}
 
-    if (VITE_DEV_SERVER_URL) {
-      win.loadURL(VITE_DEV_SERVER_URL)
-    } else {
-      // win.loadFile('dist/index.html')
-      win.loadFile(path.join(RENDERER_DIST, 'index.html'))
-    }
+function createWindow() {
+  win = new BrowserWindow({
+    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.mjs'),
+    },
+  })
+
+  // Test active push message to Renderer-process.
+  win.webContents.on('did-finish-load', () => {
+    win?.webContents.send('main-process-message', (new Date).toLocaleString())
+  })
+
+  if (VITE_DEV_SERVER_URL) {
+    win.loadURL(VITE_DEV_SERVER_URL)
+  } else {
+    // win.loadFile('dist/index.html')
+    win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
+}
 
-  // Quit when all windows are closed, except on macOS. There, it's common
-  // for applications and their menu bar to stay active until the user quits
-  // explicitly with Cmd + Q.
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      stopCpuMonitoring()
-      app.quit()
-      win = null
-    }
-  })
+// Quit when all windows are closed, except on macOS. There, it's common
+// for applications and their menu bar to stay active until the user quits
+// explicitly with Cmd + Q.
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    stopCpuMonitoring()
+    app.quit()
+    win = null
+  }
+})
 
-  app.on('activate', () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
-    }
-  })
+app.on('activate', () => {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow()
+  }
+})
 
-  app.whenReady().then(() => {
-    void startCpuMonitoring().catch((error) => {
-      console.error("Failed to start CPU monitoring:", error);
-    });
-
-    ipcMain.handle("system:cpu", async () => {
-      return getCpuInfo();
-    });
-
-    ipcMain.handle("system:memory", async () => {
-      return await getMemoryInfo();
-    });
-
-      ipcMain.handle("system:gpu", async () => {
-      return await getGpuInfo();
-    });
-
-      ipcMain.handle("system:storage", async () => {
-      return await getStorageInfo();
-    });
-
-      ipcMain.handle("system:storageDevices", async () => {
-      return await getStorageDevices();
-    });
-
-    ipcMain.handle("system:network", async () => {
-      return await getNetworkInfo();
-    });
-
-    ipcMain.handle("system:getDisplayInfo", async () => {
-      return getDisplayInfo();
-    });
-    ipcMain.handle("system:getDevices", async () => {
-      return getDevices();
-    });
-
-      ipcMain.handle(
-        "system:getFileIcon",
-        async (_event, executablePath: string) => {
-          return getFileIcon(executablePath);
-        }
-      );
-
-
-      ipcMain.handle("process:getAll", async () => {
-      return getProcesses();
-    });
-
-    ipcMain.handle(
-      "system:openFileLocation",
-      (_, executablePath: string) =>
-        openFileLocation(executablePath)
-    );
-
-    ipcMain.handle(
-      "system:endProcess",
-      async (_, pid: number) => {
-        return endProcess(pid);
-      }
-    );
-    
-    createWindow();
+app.whenReady().then(() => {
+  void startCpuMonitoring().catch((error) => {
+    console.error("Failed to start CPU monitoring:", error);
   });
+
+  ipcMain.handle("system:cpu", async () => {
+    return getCpuInfo();
+  });
+
+  ipcMain.handle("system:memory", async () => {
+    return await getMemoryInfo();
+  });
+
+  ipcMain.handle("system:gpu", async () => {
+    return await getGpuInfo();
+  });
+
+  ipcMain.handle("system:storage", async () => {
+    return await getStorageInfo();
+  });
+
+  ipcMain.handle("system:storageDevices", async () => {
+    return await getStorageDevices();
+  });
+
+  ipcMain.handle("system:network", async () => {
+    return await getNetworkInfo();
+  });
+
+  ipcMain.handle("system:getDisplayInfo", async () => {
+    return getDisplayInfo();
+  });
+
+  ipcMain.handle("system:getDevices", async () => {
+    return getDevices();
+  });
+
+  ipcMain.handle(
+    "system:getFileIcon",
+    async (_event, executablePath: unknown) => {
+      if (!isUsablePath(executablePath)) return null;
+      return getFileIcon(executablePath);
+    }
+  );
+
+  ipcMain.handle("process:getAll", async () => {
+    return getProcesses();
+  });
+
+  ipcMain.handle(
+    "system:openFileLocation",
+    (_event, executablePath: unknown) => {
+      if (!isUsablePath(executablePath)) return;
+      return openFileLocation(executablePath);
+    }
+  );
+
+  ipcMain.handle(
+    "system:endProcess",
+    async (_event, pid: unknown) => {
+      if (typeof pid !== "number") {
+        throw new Error("Invalid process ID.");
+      }
+      return endProcess(pid);
+    }
+  );
+
+  createWindow();
+});

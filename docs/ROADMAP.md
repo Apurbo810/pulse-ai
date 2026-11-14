@@ -173,11 +173,11 @@ Completed but only optional left.
 - [x] Explain detected issues in plain language
 - [x] Performance optimization recommendations
 - [x] Security recommendations
-- [ ] Gaming-specific recommendations (needs testing)
+- [X] Gaming-specific recommendations (needs testing)
 - [x] Overall system health score
 - [x] AI explanation panel for each analysis
 - [x] Suggested actions based on detected issues
-- [ ] AI-generated optimization priority list (needs testing)
+- [X] AI-generated optimization priority list (needs testing)
 
 ### Known follow-ups
 
