@@ -118,3 +118,17 @@ export interface DiagnosisReport {
   findings: DiagnosisFinding[]; // most likely cause first
   unavailableSensors: SensorKey[]; // so the report says what it could not see
 }
+
+export interface StartOptions {
+  reason?: SessionReason;
+  intervalMs?: number; // 1000 to 10000, default 2000
+  maxDurationMs?: number; // 10 s to 30 min, default 5 min
+}
+
+export interface RecorderStatus {
+  recording: boolean;
+  session: SessionMeta | null;
+  elapsedMs: number;
+  sampleCount: number;
+  lastSample: Sample | null;
+}

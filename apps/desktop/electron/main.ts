@@ -10,6 +10,8 @@ import { getDevices } from "./services/devices";
 import { getProcesses, endProcess } from "./services/process";
 import { getFileIcon } from "./services/icon";
 import { openFileLocation } from "./services/shell"
+import { createDiagnostics } from "./services/diagnostics";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // The built directory structure
@@ -31,6 +33,18 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
 let win: BrowserWindow | null
+
+let diagnostics: ReturnType<typeof createDiagnostics> | null = null;
+let quitting = false;
+
+// If the app closes during a recording, save it first
+app.on('before-quit', (event) => {
+  if (quitting || !diagnostics?.isRecording()) return;
+  event.preventDefault();
+  quitting = true;
+  void diagnostics.stop().finally(() => app.quit());
+});
+
 
 // The renderer can send anything over IPC, so check inputs before using them.
 function isUsablePath(value: unknown): value is string {
@@ -148,6 +162,9 @@ app.whenReady().then(() => {
       return endProcess(pid);
     }
   );
+
+
+  diagnostics = createDiagnostics();
 
   createWindow();
 });

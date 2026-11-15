@@ -15,6 +15,7 @@ let latestCpu: CpuInfo = {
   system: 0,
   idle: 100,
 };
+let latestPerCore: number[] = [];
 
 type GraphicsInfo = Awaited<ReturnType<typeof si.graphics>>;
 
@@ -35,6 +36,7 @@ async function sampleCpu(): Promise<void> {
   if (cpuSampling) return;
 
   cpuSampling = true;
+  
   try {
     const load = await si.currentLoad();
     latestCpu = {
@@ -42,8 +44,12 @@ async function sampleCpu(): Promise<void> {
     user: Math.round(load.currentLoadUser),
     system: Math.round(load.currentLoadSystem),
     idle: Math.round(load.currentLoadIdle),
+    
     };
+  latestPerCore = load.cpus.map((core) => Math.round(core.load));
   } finally {
+
+
     cpuSampling = false;
   }
 }
@@ -75,6 +81,11 @@ export function stopCpuMonitoring(): void {
 /** Returns the latest centrally sampled CPU value without advancing the baseline. */
 export function getCpuInfo(): CpuInfo {
   return latestCpu;
+}
+
+/** Latest per-core load (%), from the same central sampler. */
+export function getCpuPerCore(): number[] {
+  return latestPerCore;
 }
 
 async function getCachedGraphics(): Promise<GraphicsInfo> {
@@ -187,34 +198,43 @@ export async function getStorageDevices(): Promise<StorageDevice[]> {
   return [...storageMap.values()];
 }
 
-  export async function getNetworkInfo() {
-    const stats = await si.networkStats();
-    const interfaces = await si.networkInterfaces();
+export async function getNetworkInfo() {
+  const [stats, interfaces] = await Promise.all([
+    si.networkStats("*"),
+    si.networkInterfaces(),
+  ]);
 
-    const network = stats[0];
+  // The default adapter can be a VPN. Use the adapter that is up and has
+  // carried the most data, which is almost always the real network card.
+  const network =
+    [...stats]
+      .filter((s) => s.operstate === "up")
+      .sort((a, b) => b.rx_bytes + b.tx_bytes - (a.rx_bytes + a.tx_bytes))[0] ??
+    stats[0];
 
-    if (!network) {
-      return {
-        name: "Unknown",
-        connected: false,
-        speed: 0,
-        ip4: "",
-        upload: 0,
-        download: 0,
-      };
-    }
-
-    const adapter = interfaces.find(i => i.iface === network.iface);
-
+  if (!network) {
     return {
-      name: adapter?.iface ?? "Unknown",
-      connected: adapter?.operstate === "up",
-      speed: adapter?.speed ?? 0,
-      ip4: adapter?.ip4 ?? "",
-      upload: network.tx_sec,
-      download: network.rx_sec,
+      name: "Unknown",
+      connected: false,
+      speed: 0,
+      ip4: "",
+      upload: 0,
+      download: 0,
     };
   }
+
+  const adapter = interfaces.find((i) => i.iface === network.iface);
+
+  return {
+    name: adapter?.iface ?? "Unknown",
+    connected: adapter?.operstate === "up",
+    speed: adapter?.speed ?? 0,
+    ip4: adapter?.ip4 ?? "",
+    upload: network.tx_sec ?? 0,
+    download: network.rx_sec ?? 0,
+  };
+}
+
 
   export async function getDisplayInfo() {
     const graphics = await getCachedGraphics();

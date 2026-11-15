@@ -181,7 +181,7 @@ Completed but only optional left.
 
 ### Known follow-ups
 
-- [ ] Add missing names (e.g. LsaIso.exe) to the critical process list
+- [X] Add missing names (e.g. LsaIso.exe) to the critical process list
 - [ ] Real game detection for gaming tips (Week 5)
 - [ ] Replace rule-based text with LLM output (Week 8)
 
@@ -195,6 +195,8 @@ Completed but only optional left.
 - [ ] Resource trends
 - [ ] Daily reports
 - [ ] Export diagnostics
+- [ ] Diagnostic session recorder (Day 2)
+- [ ] Diagnosis engine and report   
 
 ---
 

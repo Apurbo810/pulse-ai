@@ -45,3 +45,12 @@
 
       
     });
+
+contextBridge.exposeInMainWorld("diagnostics", {
+  start: (options?: unknown) => ipcRenderer.invoke("diagnostics:start", options),
+  stop: () => ipcRenderer.invoke("diagnostics:stop"),
+  status: () => ipcRenderer.invoke("diagnostics:status"),
+  list: () => ipcRenderer.invoke("diagnostics:list"),
+  getSamples: (id: string) => ipcRenderer.invoke("diagnostics:getSamples", id),
+  remove: (id: string) => ipcRenderer.invoke("diagnostics:remove", id),
+});
