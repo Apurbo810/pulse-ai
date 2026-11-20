@@ -108,7 +108,7 @@ function formatSpeed(bytes: number) {
         <StatCard title="GPU" value={`${gpu.utilization}%`} subtitle={gpu.model} icon={Monitor} />
         <StatCard
           title="Storage"
-          value={`${storage.use}%`}
+          value={`${storage.use.toFixed(1)}%`}
           subtitle={`${formatGB(storage.used)} / ${formatGB(storage.size)} GB`}
           icon={HardDrive}
         />     

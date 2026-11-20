@@ -45,11 +45,25 @@ export class JsonlSessionStore implements SessionStore {
   }
 
   // Write to a temp file, then rename, so a crash never leaves half a file.
+  // On Windows the rename can fail for a moment when antivirus or another
+  // reader has the file open, so retry a few times.
   private async writeMeta(meta: SessionMeta): Promise<void> {
     const target = this.file(meta.id, "meta");
     const temp = `${target}.tmp`;
     await fs.writeFile(temp, JSON.stringify(meta, null, 2), "utf8");
-    await fs.rename(temp, target);
+
+    for (let attempt = 1; ; attempt += 1) {
+      try {
+        await fs.rename(temp, target);
+        return;
+      } catch (error) {
+        const code = (error as NodeJS.ErrnoException)?.code;
+        const retryable =
+          code === "EPERM" || code === "EBUSY" || code === "EACCES";
+        if (!retryable || attempt >= 5) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 40 * attempt));
+      }
+    }
   }
 
   async create(meta: SessionMeta): Promise<void> {

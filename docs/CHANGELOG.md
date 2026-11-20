@@ -596,7 +596,6 @@ All notable changes to Pulse AI will be documented in this file.
 
 ### Known Issues
 
-- Some protected Windows processes (for example `LsaIso.exe`) are not yet in the critical process list.
 - Gaming recommendations use a fixed list of applications until Game Detection is built.
 - Insight text is rule-based. Local LLM explanations are planned for Week 8.
 - Without administrator rights, Windows hides the path and owner of some processes, so some security checks cannot run.
@@ -605,3 +604,51 @@ All notable changes to Pulse AI will be documented in this file.
 ### Documentation
 
 - Updated `ROADMAP.md` for Phases 3.6 and 3.7.
+
+<!-- pulse-ai/docs/CHANGELOG.md  (add at the end of the file) -->
+
+## [0.12.0-dev] - 2026-11-20
+
+### Added
+
+#### Diagnostics
+
+- Added a diagnostics data model (`types/diagnostics.ts`). Unavailable sensors are `null`, never `0`.
+- Added a JSONL session store with crash-safe appends, session id validation, retry on short Windows file locks and pruning (50 sessions or 30 days).
+- Added a session recorder in the Electron main process:
+  - Samples CPU (total and per core, clock performance), memory, page file, GPU, disk, network and top processes.
+  - One sampler with a fixed schedule; each slow sensor reads in its own background loop and never delays a sample.
+  - Readings older than three intervals are stored as missing instead of repeated.
+  - Auto-stops after a maximum duration and saves the recording when the app quits.
+- Added per-process GPU and disk usage to the top-process samples.
+- Added primary network adapter selection (default route first, then the busiest non-virtual adapter) and recorded the adapter used for each sample.
+- Added interrupted-session recovery at startup, with a session `state` (`recording`, `completed`, `interrupted`).
+- Added per-sensor timing, skipped slot and tick lag counts to the session file, so a slow sensor can be identified.
+- Added GPU throttle-reason decoding and a CPU throttling signal (`features/diagnostics/signals.ts`).
+- Added the `window.diagnostics` preload API (`start`, `stop`, `status`, `list`, `getSamples`, `remove`).
+- Added `scripts/probe-sensors.mjs` to check which sensors a PC exposes.
+- Added Vitest tests for parsers, storage, recovery, recorder and signals.
+
+### Changed
+
+- Critical process protection now depends on the executable path as well as the name, so impersonators running outside the Windows folder can be ended.
+- Priority score: the duration and security bonuses are capped so severity always outranks them.
+- The recorder reads memory through Node's `os` module (instant, no process started).
+
+### Fixed
+
+- Added `lsaiso.exe`, `svchost.exe` and other core Windows names to the critical process list.
+- `endProcess` now rejects invalid PIDs, PID 0 and 4, and Pulse AI's own processes.
+- IPC handlers validate their inputs (process id type, absolute existing file paths).
+- Renamed the shadowed `process` variable in `process.ts`.
+- Session metadata no longer stays at `sampleCount: 0` and `endedAt: null` when a recording is interrupted.
+- Fixed the Dashboard storage value showing a long decimal number.
+- CPU sampling errors are caught instead of becoming unhandled in the main process.
+
+### Known Issues
+
+- Day 3 real-PC validation is still to be repeated after the scheduling rewrite.
+- CPU temperature and voltage are not collected.
+- Known games such as `cs2.exe` still appear as "High CPU Usage" in the analysis.
+- The Content Security Policy warning in development has not been addressed.
+- The preload still exposes a generic `ipcRenderer`.

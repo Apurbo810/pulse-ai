@@ -182,6 +182,8 @@ Completed but only optional left.
 ### Known follow-ups
 
 - [X] Add missing names (e.g. LsaIso.exe) to the critical process list
+- [x] Path-aware critical process protection and IPC input validation
+- [x] Fix priority ordering so severity always outranks bonuses
 - [ ] Real game detection for gaming tips (Week 5)
 - [ ] Replace rule-based text with LLM output (Week 8)
 

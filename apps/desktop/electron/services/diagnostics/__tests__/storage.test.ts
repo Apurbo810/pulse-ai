@@ -1,6 +1,5 @@
-// apps/desktop/electron/services/diagnostics/__tests__/storage.test.ts
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -53,7 +52,10 @@ describe("JsonlSessionStore", () => {
   it("skips a line cut off by a crash", async () => {
     await store.create(makeMeta("s1"));
     await store.append("s1", [makeSample(1)]);
-    await fs.appendFile(path.join(dir, "s1.samples.jsonl"), '{"t": 2, "top');
+    await fs.appendFile(
+      path.join(dir, "s1.samples.jsonl"),
+      '{"t": 2, "top'
+    );
 
     const samples = await store.readSamples("s1");
     expect(samples.map((s) => s.t)).toEqual([1]);
@@ -86,7 +88,11 @@ describe("JsonlSessionStore", () => {
 
   it("finish merges changes and keeps the id", async () => {
     await store.create(makeMeta("s1"));
-    await store.finish("s1", { endedAt: 5000, sampleCount: 42, id: "hacked" });
+    await store.finish("s1", {
+      endedAt: 5000,
+      sampleCount: 42,
+      id: "hacked",
+    });
 
     const meta = await store.getMeta("s1");
     expect(meta?.id).toBe("s1");
@@ -97,18 +103,25 @@ describe("JsonlSessionStore", () => {
   it("prunes sessions beyond the limit and removes both files", async () => {
     const day = 86_400_000;
     const now = Date.now();
+
     for (let i = 0; i < 4; i += 1) {
       const meta = makeMeta(`s${i}`, now - i * 1000);
       meta.endedAt = meta.startedAt + 500;
+
       await store.create(meta);
       await store.append(meta.id, [makeSample(i)]);
     }
 
-    const removed = await store.prune({ maxSessions: 2, maxAgeDays: day });
+    const removed = await store.prune({
+      maxSessions: 2,
+      maxAgeDays: day,
+    });
+
     expect(removed).toBe(2);
 
     const remaining = (await store.list()).map((m) => m.id);
     expect(remaining).toEqual(["s0", "s1"]);
+
     await expect(
       fs.access(path.join(dir, "s3.samples.jsonl"))
     ).rejects.toThrow();
@@ -116,8 +129,61 @@ describe("JsonlSessionStore", () => {
 
   it("does not prune a session that may still be recording", async () => {
     await store.create(makeMeta("live", Date.now() - 1000));
-    const removed = await store.prune({ maxSessions: 0, maxAgeDays: 0 });
+
+    const removed = await store.prune({
+      maxSessions: 0,
+      maxAgeDays: 0,
+    });
+
     expect(removed).toBe(0);
     expect(await store.getMeta("live")).not.toBeNull();
+  });
+
+  // New test 1: Retry temporary Windows file-lock errors.
+  it("retries when Windows briefly locks the metadata file", async () => {
+    await store.create(makeMeta("s1"));
+
+    const original = fs.rename.bind(fs);
+    let failures = 0;
+
+    const spy = vi.spyOn(fs, "rename").mockImplementation(async (from, to) => {
+      if (failures < 2) {
+        failures += 1;
+        throw Object.assign(new Error("locked"), { code: "EPERM" });
+      }
+
+      return original(from, to);
+    });
+
+    try {
+      await store.finish("s1", { sampleCount: 7 });
+    } finally {
+      spy.mockRestore();
+    }
+
+    expect(failures).toBe(2);
+    expect((await store.getMeta("s1"))?.sampleCount).toBe(7);
+  });
+
+  // New test 2: Do not retry permanent errors.
+  it("does not retry errors that will not go away", async () => {
+    await store.create(makeMeta("s1"));
+
+    let calls = 0;
+
+    const spy = vi.spyOn(fs, "rename").mockImplementation(async () => {
+      calls += 1;
+      throw Object.assign(new Error("disk full"), { code: "ENOSPC" });
+    });
+
+    try {
+      await expect(
+        store.finish("s1", { sampleCount: 7 })
+      ).rejects.toThrow("disk full");
+    } finally {
+      spy.mockRestore();
+    }
+
+    expect(calls).toBe(1);
   });
 });

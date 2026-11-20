@@ -36,20 +36,18 @@ async function sampleCpu(): Promise<void> {
   if (cpuSampling) return;
 
   cpuSampling = true;
-  
   try {
     const load = await si.currentLoad();
     latestCpu = {
-    usage: Math.round(load.currentLoad),
-    user: Math.round(load.currentLoadUser),
-    system: Math.round(load.currentLoadSystem),
-    idle: Math.round(load.currentLoadIdle),
-    
+      usage: Math.round(load.currentLoad),
+      user: Math.round(load.currentLoadUser),
+      system: Math.round(load.currentLoadSystem),
+      idle: Math.round(load.currentLoadIdle),
     };
-  latestPerCore = load.cpus.map((core) => Math.round(core.load));
+    latestPerCore = (load.cpus ?? []).map((core) => Math.round(core.load));
+  } catch (error) {
+    console.error("CPU sampling failed:", error);
   } finally {
-
-
     cpuSampling = false;
   }
 }
@@ -145,7 +143,7 @@ export async function getGpuInfo() {
       size: totalSize,
       used: totalUsed,
       available: totalAvailable,
-      use: (totalUsed / totalSize) * 100,
+      use: totalSize > 0 ? (totalUsed / totalSize) * 100 : 0,
     };
   }
 

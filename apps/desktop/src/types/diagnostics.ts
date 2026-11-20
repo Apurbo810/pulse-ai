@@ -7,6 +7,7 @@
 export type Reading = number | null;
 
 export type SessionReason = "manual" | "ai" | "background";
+export type SessionState = "recording" | "completed" | "interrupted";
 
 export type SensorKey =
   | "cpuUsage"
@@ -46,13 +47,18 @@ export interface SessionMeta {
   id: string;
   reason: SessionReason;
   startedAt: number; // ms since epoch
-  endedAt: number | null; // null while recording, or if the app crashed
+  endedAt: number | null; // null only while recording
+  state?: SessionState;  // null while recording, or if the app crashed
   intervalMs: number;
   sampleCount: number;
   isAdmin: boolean;
   hardware: HardwareSummary;
   sensors: SensorAvailability;
+  sensorTiming?: Record<string, SensorTiming>; // how long each sensor read took
+  skippedSlots?: number; // sampling slots lost because the app was stalled
+  maxLagMs?: number; 
   appVersion: string;
+  
 }
 
 export interface TopProcessSample {
@@ -66,6 +72,7 @@ export interface TopProcessSample {
 
 export interface Sample {
   t: number; // ms since epoch
+  lagMs?: number; // how late this tick fired, compared with its scheduled time
   cpu: {
     usage: Reading; // %
     perCore: number[]; // % per core
@@ -90,9 +97,11 @@ export interface Sample {
     activePercent: Reading; // % disk time
     queueLength: Reading;
   };
+
   network: {
     downBytesPerSec: Reading;
     upBytesPerSec: Reading;
+    adapter?: string | null; // which adapter the speeds came from
   };
   topProcesses: TopProcessSample[];
 }
@@ -131,4 +140,11 @@ export interface RecorderStatus {
   elapsedMs: number;
   sampleCount: number;
   lastSample: Sample | null;
+}
+
+export interface SensorTiming {
+  runs: number;
+  avgMs: number;
+  maxMs: number;
+  failures: number;
 }

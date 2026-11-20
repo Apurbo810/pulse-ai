@@ -113,12 +113,28 @@ export interface RawProcess {
 }
 
 /** Top processes by CPU, plus the top memory users, without duplicates. */
+// apps/desktop/electron/services/diagnostics/parsers.ts  (replaces pickTopProcesses)
+
+export interface TopProcessExtras {
+  gpu?: Map<number, number>; // % per process id
+  disk?: Map<number, number>; // bytes per second per process id
+  gpuCount?: number;
+  diskCount?: number;
+}
+
+/**
+ * Top processes by CPU and memory, plus the top GPU and disk users, so a game
+ * using the GPU with low CPU still shows up. No process appears twice.
+ */
 export function pickTopProcesses(
   list: RawProcess[],
   cpuCount = 5,
-  memoryCount = 3
+  memoryCount = 3,
+  extras: TopProcessExtras = {}
 ): TopProcessSample[] {
   const usable = list.filter((p) => p.pid > 0 && p.name);
+  const gpuOf = (pid: number) => extras.gpu?.get(pid) ?? 0;
+  const diskOf = (pid: number) => extras.disk?.get(pid) ?? 0;
 
   const byCpu = [...usable]
     .sort((a, b) => (b.cpu || 0) - (a.cpu || 0))
@@ -126,11 +142,19 @@ export function pickTopProcesses(
   const byMemory = [...usable]
     .sort((a, b) => (b.memRss || 0) - (a.memRss || 0))
     .slice(0, memoryCount);
+  const byGpu = usable
+    .filter((p) => gpuOf(p.pid) > 0)
+    .sort((a, b) => gpuOf(b.pid) - gpuOf(a.pid))
+    .slice(0, extras.gpuCount ?? 3);
+  const byDisk = usable
+    .filter((p) => diskOf(p.pid) > 0)
+    .sort((a, b) => diskOf(b.pid) - diskOf(a.pid))
+    .slice(0, extras.diskCount ?? 3);
 
   const seen = new Set<number>();
   const picked: TopProcessSample[] = [];
 
-  for (const p of [...byCpu, ...byMemory]) {
+  for (const p of [...byCpu, ...byMemory, ...byGpu, ...byDisk]) {
     if (seen.has(p.pid)) continue;
     seen.add(p.pid);
     picked.push({
@@ -138,13 +162,16 @@ export function pickTopProcesses(
       name: p.name,
       cpu: Number.isFinite(p.cpu) ? Number(p.cpu.toFixed(1)) : 0,
       memoryMB: Math.round((p.memRss || 0) / 1024),
-      gpu: 0, // per-process GPU and disk are added later
-      diskMBps: 0,
+      gpu: Number(gpuOf(p.pid).toFixed(1)),
+      diskMBps: Number((diskOf(p.pid) / 1024 / 1024).toFixed(2)),
     });
   }
 
   return picked;
 }
+
+
+
 
 // ---------- Hardware summary ----------
 
@@ -216,4 +243,69 @@ export function updateAvailability(a: SensorAvailability, s: Sample): void {
   if (has(s.disk.activePercent)) a.diskActivity = true;
   if (has(s.disk.queueLength)) a.diskQueue = true;
   if (has(s.network.downBytesPerSec)) a.network = true;
+}
+
+// apps/desktop/electron/services/diagnostics/parsers.ts  (replaces the Network section at the end)
+
+// ---------- Network ----------
+
+export interface RawNetworkStat {
+  iface: string;
+  operstate?: string;
+  rx_sec?: number | null;
+  tx_sec?: number | null;
+}
+
+export interface PrimaryNetwork {
+  down: Reading;
+  up: Reading;
+  adapter: string | null;
+}
+
+const VIRTUAL_ADAPTER =
+  /vpn|virtual|vmware|vethernet|hyper-v|loopback|\btap\b|\btun\b|tailscale|zerotier|bluetooth|radmin|wsl|docker|npcap/i;
+
+/**
+ * Picks one network adapter, so VPN traffic is not counted twice (once inside
+ * the VPN adapter, once on the real card).
+ * 1. The adapter Windows uses for its default route (preferredIface), if it
+ *    is up and has been measured.
+ * 2. Otherwise the busiest adapter that does not look virtual.
+ * 3. A virtual adapter only when nothing else is available.
+ */
+export function pickPrimaryNetwork(
+  stats: RawNetworkStat[],
+  preferredIface?: string | null
+): PrimaryNetwork {
+  const total = (s: RawNetworkStat) =>
+    (toReading(s.rx_sec) ?? 0) + (toReading(s.tx_sec) ?? 0);
+
+  const result = (s: RawNetworkStat): PrimaryNetwork => ({
+    down: toReading(s.rx_sec),
+    up: toReading(s.tx_sec),
+    adapter: s.iface ?? null,
+  });
+
+  const measured = stats.filter(
+    (s) => toReading(s.rx_sec) !== null || toReading(s.tx_sec) !== null
+  );
+  if (measured.length === 0) return { down: null, up: null, adapter: null };
+
+  const wanted = preferredIface?.trim().toLowerCase();
+  if (wanted) {
+    const preferred = measured.find(
+      (s) =>
+        s.operstate !== "down" &&
+        (s.iface ?? "").trim().toLowerCase() === wanted
+    );
+    if (preferred) return result(preferred);
+  }
+
+  const active = measured.filter((s) => s.operstate !== "down");
+  const pool = active.length > 0 ? active : measured;
+  const physical = pool.filter((s) => !VIRTUAL_ADAPTER.test(s.iface ?? ""));
+  const candidates = physical.length > 0 ? physical : pool;
+
+  const busiest = [...candidates].sort((a, b) => total(b) - total(a))[0];
+  return result(busiest);
 }

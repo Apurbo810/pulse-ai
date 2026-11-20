@@ -13,7 +13,7 @@ const execFileAsync = promisify(execFile);
  * Windows exposes GPU activity as one counter per engine. Aggregate those
  * counters by process ID so the Processes page can show a useful value.
  */
-async function getGpuUsageByProcess(): Promise<Map<number, number>> {
+export async function getGpuUsageByProcess(): Promise<Map<number, number>> {
   if (process.platform !== "win32") {
     return new Map();
   }
@@ -62,7 +62,7 @@ async function getGpuUsageByProcess(): Promise<Map<number, number>> {
 }
 
 /** Returns combined read/write disk activity in bytes per second for each process. */
-async function getDiskUsageByProcess(): Promise<Map<number, number>> {
+export async function getDiskUsageByProcess(): Promise<Map<number, number>> {
   if (process.platform !== "win32") {
     return new Map();
   }

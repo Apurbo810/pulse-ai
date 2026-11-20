@@ -346,9 +346,55 @@ Upcoming modules:
 
 Each feature will remain isolated while sharing common monitoring data through reusable services.
 
-## Project Structure
+<!-- pulse-ai/docs/ARCHITECTURE.md  (new section, insert before "## Storage Architecture") -->
+
+## Diagnostics Architecture
+
+Diagnostics records how the PC behaves over a short session so Pulse AI can explain why it is slow. It runs in the Electron main process. A button starts it today, and the AI assistant will call the same API in Week 8.
 
 ```text
+window.diagnostics (preload)
+        │
+        ▼
+IPC: diagnostics:start / stop / status / list / getSamples / remove
+        │
+        ▼
+Recorder (one sampler, fixed schedule)
+        │
+        ├── Poller: memory          (os module)
+        ├── Poller: GPU             (nvidia-smi)
+        ├── Poller: network         (primary adapter)
+        ├── Poller: top processes   (si.processes + GPU/disk counters)
+        └── CounterStream           (one long-running PowerShell process:
+                                     CPU clock, page file, disk queue, disk time)
+        │
+        ▼
+Sample[] every 2 s  ──►  JsonlSessionStore  (userData/diagnostics)
+                              ├── <id>.samples.jsonl   (append-only)
+                              └── <id>.meta.json       (progress, sensors, timing)
+```
+
+Design rules:
+
+- **Sampling never waits for a sensor.** Slow reads run in their own loop and a sample copies the latest value. A reading older than three intervals is stored as `null`.
+- **Unavailable is `null`, not `0`.** An idle GPU really is 0%, so 0 and "unknown" must stay different. The session records which sensors worked.
+- **Crash-safe storage.** Samples are appended line by line, metadata is written to a temp file and renamed (with retries on Windows file locks), and a session left unfinished by a crash is repaired from its samples at startup.
+- **Timing is recorded.** Each session stores per-sensor read times, skipped slots and tick lag.
+- **Input is validated in the main process.** Session ids cannot contain path parts, and recordings started from the UI are always `manual`.
+
+Analysis signals (`features/diagnostics/signals.ts`) decode NVIDIA throttle reasons and detect CPU clock throttling under load. The diagnosis engine (planned) will combine them into a report with causes, evidence, confidence and suggested actions.
+
+Limits:
+
+- CPU temperature and voltage need a hardware library and are not collected.
+- GPU temperature, power and throttle reasons need an NVIDIA GPU.
+- The Windows counters use English names.
+
+
+## Project Structure
+
+
+```
 pulse-ai
 ├─ .agents
 ├─ apps
@@ -361,6 +407,19 @@ pulse-ai
 │     │  ├─ preload.ts
 │     │  └─ services
 │     │     ├─ devices.ts
+│     │     ├─ diagnostics
+│     │     │  ├─ counters.ts
+│     │     │  ├─ index.ts
+│     │     │  ├─ parsers.ts
+│     │     │  ├─ recorder.ts
+│     │     │  ├─ recovery.ts
+│     │     │  ├─ sensors.ts
+│     │     │  ├─ storage.ts
+│     │     │  └─ __tests__
+│     │     │     ├─ parsers-extra.test.ts
+│     │     │     ├─ recorder.test.ts
+│     │     │     ├─ recovery.test.ts
+│     │     │     └─ storage.test.ts
 │     │     ├─ icon.ts
 │     │     ├─ process.ts
 │     │     ├─ processes
@@ -372,33 +431,47 @@ pulse-ai
 │     ├─ package-lock.json
 │     ├─ package.json
 │     ├─ public
+│     │  ├─ electron-vite.animate.svg
+│     │  ├─ electron-vite.svg
+│     │  └─ vite.svg
 │     ├─ README.md
 │     ├─ release
+│     │  └─ 0.0.0
+│     │     └─ win-unpacked
+│     ├─ scripts
+│     │  ├─ probe-result.json
+│     │  └─ probe-sensors.mjs
 │     ├─ src
 │     │  ├─ app
-│     │  │  ├─ App.tsx
-│     │  │  └─ router.tsx
+│     │  │  ├─ App.css
+│     │  │  └─ App.tsx
 │     │  ├─ assets
+│     │  │  └─ logo
 │     │  ├─ components
-│     │  │  ├─ layout
-│     │  │  │  ├─ AppLayout.tsx
-│     │  │  │  ├─ Header.tsx
-│     │  │  │  ├─ MainContent.tsx
-│     │  │  │  └─ Sidebar.tsx
+│     │  │  ├─ cards
 │     │  │  ├─ navigation
 │     │  │  │  └─ NavItem.tsx
 │     │  │  ├─ shared
 │     │  │  │  └─ ApplicationIcon.tsx
 │     │  │  └─ ui
+│     │  │     ├─ badge.tsx
+│     │  │     ├─ button.tsx
+│     │  │     ├─ card.tsx
+│     │  │     ├─ chart.tsx
+│     │  │     ├─ context-menu.tsx
+│     │  │     ├─ dialog.tsx
+│     │  │     ├─ input.tsx
+│     │  │     ├─ progress.tsx
+│     │  │     └─ table.tsx
 │     │  ├─ constants
 │     │  │  ├─ app.ts
 │     │  │  ├─ colors.ts
 │     │  │  └─ navigation.ts
 │     │  ├─ features
 │     │  │  ├─ ai
+│     │  │  │  └─ ai.ts
 │     │  │  ├─ analysis
 │     │  │  │  ├─ AnalysisPage.tsx
-│     │  │  │  ├─ SeverityBadge.tsx
 │     │  │  │  ├─ components
 │     │  │  │  │  ├─ AnalysisCard.tsx
 │     │  │  │  │  ├─ EmptyState.tsx
@@ -408,16 +481,43 @@ pulse-ai
 │     │  │  │  ├─ hooks
 │     │  │  │  │  ├─ useAnalysis.ts
 │     │  │  │  │  └─ useInsights.ts
-│     │  │  │  └─ insights
-│     │  │  │     ├─ buildInsights.ts
-│     │  │  │     ├─ explanations.ts
-│     │  │  │     ├─ healthScore.ts
-│     │  │  │     ├─ priority.ts
-│     │  │  │     ├─ recommendations.ts
-│     │  │  │     └─ types.ts
+│     │  │  │  ├─ insights
+│     │  │  │  │  ├─ buildInsights.ts
+│     │  │  │  │  ├─ explanations.ts
+│     │  │  │  │  ├─ healthScore.ts
+│     │  │  │  │  ├─ priority.ts
+│     │  │  │  │  ├─ recommendations.ts
+│     │  │  │  │  ├─ types.ts
+│     │  │  │  │  └─ __tests__
+│     │  │  │  │     ├─ buildInsights.test.ts
+│     │  │  │  │     ├─ healthScore.test.ts
+│     │  │  │  │     ├─ priority.test.ts
+│     │  │  │  │     └─ recommendations.test.ts
+│     │  │  │  └─ SeverityBadge.tsx
 │     │  │  ├─ dashboard
+│     │  │  │  ├─ components
+│     │  │  │  │  └─ StatCard.tsx
+│     │  │  │  └─ DashboardPage.tsx
+│     │  │  ├─ diagnostics
+│     │  │  │  ├─ signals.ts
+│     │  │  │  └─ __tests__
+│     │  │  │     └─ signals.test.ts
 │     │  │  ├─ gaming
 │     │  │  ├─ monitoring
+│     │  │  │  ├─ components
+│     │  │  │  │  ├─ CpuCard.tsx
+│     │  │  │  │  ├─ DevicesCard.tsx
+│     │  │  │  │  ├─ DiskUsageCard.tsx
+│     │  │  │  │  ├─ DisplayCard.tsx
+│     │  │  │  │  ├─ GpuCard.tsx
+│     │  │  │  │  ├─ HistoryChart.tsx
+│     │  │  │  │  ├─ MemoryCard.tsx
+│     │  │  │  │  ├─ NetworkCard.tsx
+│     │  │  │  │  └─ StorageCard.tsx
+│     │  │  │  ├─ hooks
+│     │  │  │  │  └─ useHistory.ts
+│     │  │  │  └─ pages
+│     │  │  │     └─ MonitoringPage.tsx
 │     │  │  ├─ optimizer
 │     │  │  ├─ processes
 │     │  │  │  ├─ analysis
@@ -429,31 +529,85 @@ pulse-ai
 │     │  │  │  │  ├─ memoryAnalyzer.ts
 │     │  │  │  │  ├─ shared.ts
 │     │  │  │  │  ├─ suspiciousAnalyzer.ts
-│     │  │  │  │  └─ types.ts
+│     │  │  │  │  ├─ types.ts
+│     │  │  │  │  └─ __tests__
+│     │  │  │  │     ├─ analysisEngine.test.ts
+│     │  │  │  │     ├─ analyzers.test.ts
+│     │  │  │  │     └─ shared.test.ts
 │     │  │  │  ├─ components
+│     │  │  │  │  ├─ actions
+│     │  │  │  │  │  └─ ProcessActions.tsx
+│     │  │  │  │  ├─ dialogs
+│     │  │  │  │  │  ├─ ProcessPropertiesDialog.tsx
+│     │  │  │  │  │  └─ sections
+│     │  │  │  │  │     ├─ ExecutableSection.tsx
+│     │  │  │  │  │     ├─ OverviewSection.tsx
+│     │  │  │  │  │     ├─ PerformanceSection.tsx
+│     │  │  │  │  │     ├─ ProcessAdvancedSection.tsx
+│     │  │  │  │  │     └─ ProcessDetailsSection.tsx
+│     │  │  │  │  ├─ menus
+│     │  │  │  │  │  └─ ProcessContextMenu.tsx
+│     │  │  │  │  ├─ table
+│     │  │  │  │  │  ├─ ProcessRow.tsx
+│     │  │  │  │  │  ├─ ProcessTable.tsx
+│     │  │  │  │  │  └─ SortableHeader.tsx
+│     │  │  │  │  └─ toolbar
+│     │  │  │  │     ├─ ProcessFilterBar.tsx
+│     │  │  │  │     ├─ ProcessToolbar.tsx
+│     │  │  │  │     └─ RefreshIntervalSelect.tsx
 │     │  │  │  ├─ hooks
+│     │  │  │  │  └─ useProcesses.ts
 │     │  │  │  ├─ ProcessesPage.tsx
 │     │  │  │  ├─ types.ts
 │     │  │  │  └─ utils
+│     │  │  │     └─ preferences.ts
 │     │  │  ├─ settings
 │     │  │  ├─ shared
+│     │  │  │  └─ utils
+│     │  │  │     └─ status.ts
 │     │  │  └─ storage
+│     │  │     ├─ components
+│     │  │     │  ├─ PartitionCard.tsx
+│     │  │     │  ├─ StorageGroupCard.tsx
+│     │  │     │  └─ StorageOverview.tsx
+│     │  │     ├─ hooks
+│     │  │     │  └─ useStorage.ts
+│     │  │     ├─ pages
+│     │  │     │  ├─ DriveDetailsPage.tsx
+│     │  │     │  └─ StoragePage.tsx
+│     │  │     └─ utils
+│     │  │        └─ storageFormat.ts
 │     │  ├─ hooks
 │     │  │  └─ useSystemMonitor.ts
+│     │  ├─ index.css
 │     │  ├─ lib
+│     │  │  ├─ ai.ts
 │     │  │  ├─ electron.ts
 │     │  │  ├─ ipc.ts
 │     │  │  ├─ monitor.ts
 │     │  │  ├─ system.ts
 │     │  │  └─ utils.ts
 │     │  ├─ main.tsx
+│     │  ├─ styles
+│     │  ├─ test
+│     │  │  └─ helpers.ts
 │     │  ├─ types
+│     │  │  ├─ diagnostics.ts
+│     │  │  ├─ electron-diagnostics.d.ts
 │     │  │  └─ system.ts
+│     │  ├─ utils
 │     │  └─ vite-env.d.ts
 │     ├─ test-cpu.js
 │     ├─ tsconfig.json
 │     ├─ tsconfig.node.json
-│     └─ vite.config.ts
+│     ├─ tsconfig.node.tsbuildinfo
+│     ├─ tsconfig.tsbuildinfo
+│     ├─ vite.config.d.ts
+│     ├─ vite.config.js
+│     ├─ vite.config.ts
+│     ├─ vite.config.ts.timestamp-1784449007718-571f3bd1253da.mjs
+│     ├─ vite.config.ts.timestamp-1793547160027-44dc9258262ad.mjs
+│     └─ vitest.config.ts
 ├─ docs
 │  ├─ ARCHITECTURE.md
 │  ├─ CHANGELOG.md
@@ -467,4 +621,5 @@ pulse-ai
 │  ├─ shared
 │  └─ ui
 └─ README.md
+
 ```

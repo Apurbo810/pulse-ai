@@ -2,12 +2,14 @@
 
 import { app, ipcMain } from "electron";
 import path from "node:path";
+import os from "node:os";
 import si from "systeminformation";
 
 import type { StartOptions } from "../../../src/types/diagnostics";
 import { CounterStream } from "./counters";
 import { pickTopProcesses } from "./parsers";
 import { Recorder, type SamplerDeps } from "./recorder";
+import { recoverInterruptedSessions } from "./recovery";
 import {
   readHardwareSummary,
   readIsAdmin,
@@ -15,12 +17,8 @@ import {
   readNvidia,
 } from "./sensors";
 import { JsonlSessionStore, isValidSessionId } from "./storage";
-import {
-  getCpuInfo,
-  getCpuPerCore,
-  getGpuInfo,
-  getMemoryInfo,
-} from "../system";
+import { getCpuInfo, getCpuPerCore, getGpuInfo } from "../system";
+import { getDiskUsageByProcess, getGpuUsageByProcess } from "../process";
 
 // The renderer can send anything, so only accept plain numbers.
 // Recordings started from the UI are always "manual".
@@ -44,11 +42,13 @@ export function createDiagnostics() {
 
     readCpu: () => ({ usage: getCpuInfo().usage, perCore: getCpuPerCore() }),
 
+    // os.totalmem/freemem are instant and start no process, unlike si.mem()
     readMemory: async () => {
-      const memory = await getMemoryInfo();
+      const total = os.totalmem();
+      const used = total - os.freemem();
       return {
-        usedPercent: memory.total > 0 ? (memory.used / memory.total) * 100 : null,
-        usedMB: Math.round(memory.used / 1024 / 1024),
+        usedPercent: total > 0 ? (used / total) * 100 : null,
+        usedMB: Math.round(used / 1024 / 1024),
       };
     },
 
@@ -56,7 +56,16 @@ export function createDiagnostics() {
     readGpu: readNvidia,
     readNetwork,
 
-    readTopProcesses: async () => pickTopProcesses((await si.processes()).list),
+    readTopProcesses: async () => {
+      // GPU and disk per process come from Windows counters, so read them
+      // together with the process list
+      const [processes, gpu, disk] = await Promise.all([
+        si.processes(),
+        getGpuUsageByProcess(),
+        getDiskUsageByProcess(),
+      ]);
+      return pickTopProcesses(processes.list, 5, 3, { gpu, disk });
+    },
 
     readHardware: async () => {
       const gpu = await getGpuInfo().catch(() => null);
@@ -69,17 +78,31 @@ export function createDiagnostics() {
 
   const recorder = new Recorder(store, deps, app.getVersion());
 
-  // Keep the last 50 sessions, for at most 30 days
-  void store
-    .prune({ maxSessions: 50, maxAgeDays: 30 })
-    .catch((error) => console.error("Diagnostics prune failed:", error));
+  // At startup nothing can be recording, so any unfinished session was cut
+  // short. Repair those first, then remove old ones.
+  // Keep the last 50 sessions, for at most 30 days.
+  const ready = recoverInterruptedSessions(store)
+    .then((repaired) => {
+      if (repaired > 0) console.log(`Diagnostics: repaired ${repaired} interrupted session(s).`);
+      return store.prune({ maxSessions: 50, maxAgeDays: 30 });
+    })
+    .then(() => undefined)
+    .catch((error) => console.error("Diagnostics startup cleanup failed:", error));
 
-  ipcMain.handle("diagnostics:start", (_event, options: unknown) =>
-    recorder.start(sanitizeOptions(options))
-  );
+  ipcMain.handle("diagnostics:start", async (_event, options: unknown) => {
+    await ready; // recovery must not mistake a new recording for an old one
+    return recorder.start(sanitizeOptions(options));
+  });
   ipcMain.handle("diagnostics:stop", () => recorder.stop());
   ipcMain.handle("diagnostics:status", () => recorder.status());
-  ipcMain.handle("diagnostics:list", () => store.list());
+
+  ipcMain.handle("diagnostics:list", async () => {
+    await ready;
+    const sessions = await store.list();
+    const live = recorder.status().session;
+    // The file on disk lags behind a recording in progress, so show live numbers
+    return live ? sessions.map((s) => (s.id === live.id ? live : s)) : sessions;
+  });
 
   ipcMain.handle("diagnostics:getSamples", (_event, id: unknown) => {
     if (!isValidSessionId(id)) throw new Error("Invalid session id.");

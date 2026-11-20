@@ -12,6 +12,19 @@ pulse-ai
 │     │  ├─ preload.ts
 │     │  └─ services
 │     │     ├─ devices.ts
+│     │     ├─ diagnostics
+│     │     │  ├─ counters.ts
+│     │     │  ├─ index.ts
+│     │     │  ├─ parsers.ts
+│     │     │  ├─ recorder.ts
+│     │     │  ├─ recovery.ts
+│     │     │  ├─ sensors.ts
+│     │     │  ├─ storage.ts
+│     │     │  └─ __tests__
+│     │     │     ├─ parsers-extra.test.ts
+│     │     │     ├─ recorder.test.ts
+│     │     │     ├─ recovery.test.ts
+│     │     │     └─ storage.test.ts
 │     │     ├─ icon.ts
 │     │     ├─ process.ts
 │     │     ├─ processes
@@ -30,6 +43,9 @@ pulse-ai
 │     ├─ release
 │     │  └─ 0.0.0
 │     │     └─ win-unpacked
+│     ├─ scripts
+│     │  ├─ probe-result.json
+│     │  └─ probe-sensors.mjs
 │     ├─ src
 │     │  ├─ app
 │     │  │  ├─ App.css
@@ -76,12 +92,21 @@ pulse-ai
 │     │  │  │  │  ├─ healthScore.ts
 │     │  │  │  │  ├─ priority.ts
 │     │  │  │  │  ├─ recommendations.ts
-│     │  │  │  │  └─ types.ts
+│     │  │  │  │  ├─ types.ts
+│     │  │  │  │  └─ __tests__
+│     │  │  │  │     ├─ buildInsights.test.ts
+│     │  │  │  │     ├─ healthScore.test.ts
+│     │  │  │  │     ├─ priority.test.ts
+│     │  │  │  │     └─ recommendations.test.ts
 │     │  │  │  └─ SeverityBadge.tsx
 │     │  │  ├─ dashboard
 │     │  │  │  ├─ components
 │     │  │  │  │  └─ StatCard.tsx
 │     │  │  │  └─ DashboardPage.tsx
+│     │  │  ├─ diagnostics
+│     │  │  │  ├─ signals.ts
+│     │  │  │  └─ __tests__
+│     │  │  │     └─ signals.test.ts
 │     │  │  ├─ gaming
 │     │  │  ├─ monitoring
 │     │  │  │  ├─ components
@@ -109,7 +134,11 @@ pulse-ai
 │     │  │  │  │  ├─ memoryAnalyzer.ts
 │     │  │  │  │  ├─ shared.ts
 │     │  │  │  │  ├─ suspiciousAnalyzer.ts
-│     │  │  │  │  └─ types.ts
+│     │  │  │  │  ├─ types.ts
+│     │  │  │  │  └─ __tests__
+│     │  │  │  │     ├─ analysisEngine.test.ts
+│     │  │  │  │     ├─ analyzers.test.ts
+│     │  │  │  │     └─ shared.test.ts
 │     │  │  │  ├─ components
 │     │  │  │  │  ├─ actions
 │     │  │  │  │  │  └─ ProcessActions.tsx
@@ -165,16 +194,25 @@ pulse-ai
 │     │  │  └─ utils.ts
 │     │  ├─ main.tsx
 │     │  ├─ styles
+│     │  ├─ test
+│     │  │  └─ helpers.ts
 │     │  ├─ types
+│     │  │  ├─ diagnostics.ts
+│     │  │  ├─ electron-diagnostics.d.ts
 │     │  │  └─ system.ts
 │     │  ├─ utils
 │     │  └─ vite-env.d.ts
 │     ├─ test-cpu.js
 │     ├─ tsconfig.json
 │     ├─ tsconfig.node.json
+│     ├─ tsconfig.node.tsbuildinfo
+│     ├─ tsconfig.tsbuildinfo
+│     ├─ vite.config.d.ts
+│     ├─ vite.config.js
 │     ├─ vite.config.ts
 │     ├─ vite.config.ts.timestamp-1784449007718-571f3bd1253da.mjs
-│     └─ vite.config.ts.timestamp-1793547160027-44dc9258262ad.mjs
+│     ├─ vite.config.ts.timestamp-1793547160027-44dc9258262ad.mjs
+│     └─ vitest.config.ts
 ├─ docs
 │  ├─ ARCHITECTURE.md
 │  ├─ CHANGELOG.md

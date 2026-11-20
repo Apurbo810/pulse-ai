@@ -4,16 +4,14 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import si from "systeminformation";
 
-import type {
-  HardwareSummary,
-  Reading,
-} from "../../../src/types/diagnostics";
+import type { HardwareSummary } from "../../../src/types/diagnostics";
 import {
   parseActiveScheme,
   parseNvidiaCsv,
   parsePhysicalDisks,
-  toReading,
+  pickPrimaryNetwork,
   type NvidiaReading,
+  type PrimaryNetwork,
 } from "./parsers";
 
 const execFileAsync = promisify(execFile);
@@ -41,25 +39,54 @@ export async function readNvidia(): Promise<NvidiaReading | null> {
   }
 }
 
-/** Network speed summed over all adapters, so a VPN adapter cannot hide real traffic. */
-export async function readNetwork(): Promise<{ down: Reading; up: Reading }> {
-  const stats = await si.networkStats("*");
+// ---------- Network ----------
 
-  let down = 0;
-  let up = 0;
-  let seen = false;
+const DEFAULT_IFACE_TTL_MS = 60_000;
 
-  for (const adapter of stats) {
-    const rx = toReading(adapter.rx_sec);
-    const tx = toReading(adapter.tx_sec);
-    if (rx === null && tx === null) continue;
-    seen = true;
-    down += rx ?? 0;
-    up += tx ?? 0;
+let defaultIface: string | null = null;
+let defaultIfaceAt = 0; // 0 = never resolved
+let defaultIfaceInFlight: Promise<void> | null = null;
+
+async function refreshDefaultIface(): Promise<void> {
+  try {
+    const name = await si.networkInterfaceDefault();
+    defaultIface = name && name.trim() ? name.trim() : null;
+  } catch {
+    defaultIface = null;
+  } finally {
+    defaultIfaceAt = Date.now();
+  }
+}
+
+/**
+ * The adapter Windows uses for its default route. Resolved once (the first
+ * sample waits for it), then refreshed in the background every minute.
+ */
+async function getDefaultIface(): Promise<string | null> {
+  const stale = Date.now() - defaultIfaceAt > DEFAULT_IFACE_TTL_MS;
+
+  if (stale && !defaultIfaceInFlight) {
+    defaultIfaceInFlight = refreshDefaultIface().finally(() => {
+      defaultIfaceInFlight = null;
+    });
+  }
+  if (defaultIfaceAt === 0 && defaultIfaceInFlight) {
+    await defaultIfaceInFlight;
   }
 
-  return seen ? { down, up } : { down: null, up: null };
+  return defaultIface;
 }
+
+/** Speed of the main network adapter, and which adapter it was. */
+export async function readNetwork(): Promise<PrimaryNetwork> {
+  const [stats, preferred] = await Promise.all([
+    si.networkStats("*"),
+    getDefaultIface(),
+  ]);
+  return pickPrimaryNetwork(stats, preferred);
+}
+
+// ---------- System ----------
 
 export async function readIsAdmin(): Promise<boolean> {
   try {
